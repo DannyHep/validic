@@ -1,6 +1,7 @@
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
+import express from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
+import router from "./routes/user.js";
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -11,8 +12,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // routes
-const userRouter = require("./routes/user");
-app.use("/user", userRouter);
+app.use("/user", router);
 
 app.listen(port, () => {
   console.log(`server is running on port ${port}`);
