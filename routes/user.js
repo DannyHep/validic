@@ -1,8 +1,16 @@
 import express from "express";
-import userController from "../controllers/user.js";
+import {
+  //  getAllUsers,
+  createNewUser,
+  getValidicProfile,
+  getValidicFitnessData,
+} from "../controllers/user.js";
 
 const router = express.Router();
 
-router.get("/myHealth", userController);
+// router.get("/my-health", getAllUsers);
+router.post("/validic-fitness-data", getValidicFitnessData);
+router.post("/create-validic-profile", createNewUser);
+router.post("/validic-profile", getValidicProfile);
 
-export default router;
+export { router };
