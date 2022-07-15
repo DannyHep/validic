@@ -37,8 +37,9 @@ export async function createNewUser(req, res) {
     );
 
     const localURL = process.env.LOCAL_URL;
+    const apiURL = process.env.PATIENTAIDE_LOGIN_API;
     const updateValidicStatusResponse = await got.put(
-      `${localURL}/user/updateValidicStatus`,
+      `${apiURL}/user/updateValidicStatus`,
       {
         json: {
           status: true,
@@ -61,7 +62,6 @@ export async function getValidicProfile(req, res) {
     const response = await got.get(
       `https://api.v2.validic.com/organizations/${orgId}/users/${patientId}?token=${token}`
     );
-    console.log(response.body);
     res.send(response.body);
   } catch (error) {
     console.log(error);
@@ -70,27 +70,43 @@ export async function getValidicProfile(req, res) {
 
 export async function getValidicFitnessData(req, res) {
   const { orgId, token, uid } = req.body;
-  console.log(orgId, token, uid);
   try {
+    const todayDate = new Date();
+    const todayDateStr = todayDate.toISOString().slice(0, 10);
+    const startDate = new Date(new Date().setDate(todayDate.getDate() - 30))
+      .toISOString()
+      .slice(0, 10);
     const measurementsResponse = await got.get(
-      `https://api.v2.validic.com/organizations/${orgId}/users/${uid}/measurements?token=${token}`
+      `https://api.v2.validic.com/organizations/${orgId}/users/${uid}/measurements?start_date=${startDate}&&end_date=${todayDateStr}&token=${token}`
     );
     const nutritionResponse = await got.get(
-      `https://api.v2.validic.com/organizations/${orgId}/users/${uid}/nutrition?token=${token}`
+      `https://api.v2.validic.com/organizations/${orgId}/users/${uid}/nutrition?start_date=${startDate}&&end_date=${todayDateStr}&token=${token}`
     );
     const sleepResponse = await got.get(
-      `https://api.v2.validic.com/organizations/${orgId}/users/${uid}/sleep?token=${token}`
+      `https://api.v2.validic.com/organizations/${orgId}/users/${uid}/sleep?start_date=${startDate}&&end_date=${todayDateStr}&token=${token}`
     );
     const summaryResponse = await got.get(
-      `https://api.v2.validic.com/organizations/${orgId}/users/${uid}/summaries?token=${token}`
+      `https://api.v2.validic.com/organizations/${orgId}/users/${uid}/summaries?start_date=${startDate}&&end_date=${todayDateStr}&token=${token}`
+    );
+    const workoutResponse = await got.get(
+      `https://api.v2.validic.com/organizations/${orgId}/users/${uid}/workouts?start_date=${startDate}&&end_date=${todayDateStr}&token=${token}`
+    );
+    const intradayResponse = await got.get(
+      `https://api.v2.validic.com/organizations/${orgId}/users/${uid}/intraday?start_date=${startDate}&&end_date=${todayDateStr}&token=${token}`
     );
 
-    res.send({
+    const responseData = {
       measurements: JSON.parse(measurementsResponse.body),
-      nutrition: JSON.parse(measurementsResponse.body),
+      nutrition: JSON.parse(nutritionResponse.body),
       sleep: JSON.parse(sleepResponse.body),
       summary: JSON.parse(summaryResponse.body),
-    });
+      workout: JSON.parse(workoutResponse.body),
+      intraday: JSON.parse(intradayResponse.body),
+      startDate: startDate,
+      todayDateStr: todayDateStr,
+    };
+
+    res.send(responseData);
   } catch (error) {
     console.log(error);
   }
