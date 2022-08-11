@@ -58,6 +58,8 @@ export async function createNewUser(req, res) {
 
 export async function getValidicProfile(req, res) {
   const { orgId, token, patientId } = req.body;
+  console.log(patientId);
+  console.log("fire");
   try {
     const response = await got.get(
       `https://api.v2.validic.com/organizations/${orgId}/users/${patientId}?token=${token}`
@@ -102,8 +104,6 @@ export async function getValidicFitnessData(req, res) {
       summary: JSON.parse(summaryResponse.body),
       workout: JSON.parse(workoutResponse.body),
       intraday: JSON.parse(intradayResponse.body),
-      startDate: startDate,
-      todayDateStr: todayDateStr,
     };
 
     res.send(responseData);
