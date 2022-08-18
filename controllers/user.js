@@ -39,7 +39,7 @@ export async function createNewUser(req, res) {
     const localURL = process.env.LOCAL_URL;
     const apiURL = process.env.PATIENTAIDE_LOGIN_API;
     const updateValidicStatusResponse = await got.put(
-      `${apiURL}/user/updateValidicStatus`,
+      `${apiURL}/patAide/updateValidicStatus`,
       {
         json: {
           status: true,
@@ -47,9 +47,10 @@ export async function createNewUser(req, res) {
         },
       }
     );
+    console.log(updateValidicStatusResponse, "FIRST TEST");
+    // console.log(createUserResponse);
     res.send({
-      updateValidicStatusResponse: updateValidicStatusResponse,
-      createUserResponse: createUserResponse.body,
+      success: true,
     });
   } catch (error) {
     console.log(error, "error response");
