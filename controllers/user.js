@@ -23,19 +23,14 @@ import got from "got";
 export async function createNewUser(req, res) {
   const { orgId, token, uid } = req.body;
   try {
-    const createUserResponse = await got.post(
+    await got.post(
       `https://api.v2.validic.com/organizations/${orgId}/users?token=${token}`,
       {
         json: {
           uid: uid,
-          location: {
-            timezone: "America/New_York",
-            country_code: "GB",
-          },
         },
       }
     );
-
     const localURL = process.env.LOCAL_URL;
     const apiURL = process.env.PATIENTAIDE_LOGIN_API;
     const updateValidicStatusResponse = await got.put(
@@ -57,8 +52,6 @@ export async function createNewUser(req, res) {
 
 export async function getValidicProfile(req, res) {
   const { orgId, token, patientId } = req.body;
-  console.log(patientId);
-  console.log("fire");
   try {
     const response = await got.get(
       `https://api.v2.validic.com/organizations/${orgId}/users/${patientId}?token=${token}`
