@@ -47,8 +47,6 @@ export async function createNewUser(req, res) {
         },
       }
     );
-    console.log(updateValidicStatusResponse, "FIRST TEST");
-    // console.log(createUserResponse);
     res.send({
       success: true,
     });
