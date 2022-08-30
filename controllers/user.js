@@ -1,28 +1,10 @@
 import got from "got";
 
-// export async function getAllUsers(req, res) {
-//   const { orgId, token } = req.query;
-
-//   try {
-//     console.log(orgId, token, "token");
-//     const response = await got.get(
-//       `https://api.v2.validic.com/organizations/${orgId}/users?token=${token}`
-//     );
-//     console.log(response, "here");
-//     res.json({
-//       userData: JSON.parse(response.body),
-//     });
-//     console.log(response.body);
-//     //=> '<!doctype html> ...'
-//   } catch (error) {
-//     console.log(error.response.body, "error");
-//     //=> 'Internal server error ...'
-//   }
-// }
-
 export async function createNewUser(req, res) {
-  const { orgId, token, uid } = req.body;
+  const { uid } = req.body;
   try {
+    const token = process.env.VALIDIC_TOKEN;
+    const orgId = process.env.NSTFS_VALIDIC_ORGID;
     await got.post(
       `https://api.v2.validic.com/organizations/${orgId}/users?token=${token}`,
       {
@@ -51,8 +33,10 @@ export async function createNewUser(req, res) {
 }
 
 export async function getValidicProfile(req, res) {
-  const { orgId, token, patientId } = req.body;
+  const { patientId } = req.body;
   try {
+    const token = process.env.VALIDIC_TOKEN;
+    const orgId = process.env.NSTFS_VALIDIC_ORGID;
     const response = await got.get(
       `https://api.v2.validic.com/organizations/${orgId}/users/${patientId}?token=${token}`
     );
@@ -63,8 +47,10 @@ export async function getValidicProfile(req, res) {
 }
 
 export async function getValidicFitnessData(req, res) {
-  const { orgId, token, uid } = req.body;
+  const { uid } = req.body;
   try {
+    const token = process.env.VALIDIC_TOKEN;
+    const orgId = process.env.NSTFS_VALIDIC_ORGID;
     const todayDate = new Date();
     const todayDateStr = todayDate.toISOString().slice(0, 10);
     const startDate = new Date(new Date().setDate(todayDate.getDate() - 30))
