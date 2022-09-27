@@ -1,10 +1,24 @@
 import express from "express";
 import cors from "cors";
+import mongoose from "mongoose";
 import { router } from "./routes/user.js";
 import "dotenv/config";
 
 const app = express();
 const port = process.env.PORT || 8088;
+const { MONGODB_URI } = process.env;
+
+mongoose
+  .connect(
+    MONGODB_URI ||
+      "mongodb+srv://fabadea:Token123@cluster0.tn1tw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+  )
+  .then(() => {
+    console.log("connected to mongoDB");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 app.use(express.json());
 app.use(cors());

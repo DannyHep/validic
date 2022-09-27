@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const healthTrackerSchema = new Schema({
+const HealthTrackerSchema = new Schema({
   summary: {
     steps: [
       { value: Number, date: String, unit: { type: String, default: "steps" } },
@@ -257,6 +257,7 @@ const healthTrackerSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "units" },
+        default: 0,
       },
     ],
     hadADrinkToday: [
@@ -271,6 +272,7 @@ const healthTrackerSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "days" },
+        default: 0,
       },
     ],
   },
@@ -290,3 +292,7 @@ const healthTrackerSchema = new Schema({
     ],
   },
 });
+
+const HealthTracker = mongoose.model("HealthTracker", HealthTrackerSchema);
+
+module.exports = HealthTracker;
