@@ -75,6 +75,7 @@ export async function getValidicFitnessData(req, res) {
       `https://api.v2.validic.com/organizations/${orgId}/users/${uid}/intraday?start_date=${startDate}&&end_date=${todayDateStr}&token=${token}`
     );
 
+    console.log(JSON.parse(summaryResponse.body));
     const responseData = {
       measurements: JSON.parse(measurementsResponse.body),
       nutrition: JSON.parse(nutritionResponse.body),
