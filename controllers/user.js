@@ -1,4 +1,6 @@
 import got from "got";
+import HealthTrackerValues from "../models/healthTracker.js";
+import { healthTrackerParser } from "./parsers/healthTrackerParser.js";
 
 export async function createNewUser(req, res) {
   const { uid } = req.body;
@@ -46,8 +48,8 @@ export async function getValidicProfile(req, res) {
   }
 }
 
-export async function getValidicFitnessData(req, res) {
-  const { uid } = req.body;
+export async function getValidicFitnessData(uid) {
+  // const { uid } = req.body;
   try {
     const token = process.env.VALIDIC_TOKEN;
     const orgId = process.env.NSTFS_VALIDIC_ORGID;
@@ -75,7 +77,6 @@ export async function getValidicFitnessData(req, res) {
       `https://api.v2.validic.com/organizations/${orgId}/users/${uid}/intraday?start_date=${startDate}&&end_date=${todayDateStr}&token=${token}`
     );
 
-    console.log(JSON.parse(summaryResponse.body));
     const responseData = {
       measurements: JSON.parse(measurementsResponse.body),
       nutrition: JSON.parse(nutritionResponse.body),
@@ -85,8 +86,44 @@ export async function getValidicFitnessData(req, res) {
       intraday: JSON.parse(intradayResponse.body),
     };
 
-    res.send(responseData);
+    return responseData;
   } catch (error) {
     console.log(error);
   }
+}
+
+export async function createTrackerMeasurements(req, res) {
+  const { PASID } = req.body;
+
+  const trackerMeasurements = new HealthTrackerValues({ PASID: PASID });
+
+  const response = await trackerMeasurements.save();
+
+  res.send(response);
+}
+
+export async function getTrackerMeasurements(PASID) {
+  // const { PASID } = req.body;
+
+  try {
+    const trackerMeasurements = await HealthTrackerValues.findOne({
+      PASID: PASID,
+    });
+    return trackerMeasurements;
+  } catch (err) {
+    res.send(err);
+  }
+}
+
+export async function parsedTrackerData(req, res) {
+  const { uid, PASID } = req.body;
+  const validicData = await getValidicFitnessData(uid);
+  const dbTrackerData = await getTrackerMeasurements(PASID);
+
+  // console.log(dbTrackerData);
+  // console.log(validicData, "123");
+  // healthTrackerParser(validicData, dbTrackerData);
+  console.log(healthTrackerParser(validicData, dbTrackerData));
+
+  res.send(validicData);
 }

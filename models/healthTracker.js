@@ -1,10 +1,15 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
-const HealthTrackerSchema = new Schema({
+const HealthTrackerValuesSchema = new Schema({
+  PASID: String,
   summary: {
     steps: [
-      { value: Number, date: String, unit: { type: String, default: "steps" } },
+      {
+        value: Number,
+        date: String,
+        unit: { type: String, default: "steps" },
+      },
     ],
     distance: [
       { value: Number, date: String, unit: { type: String, default: "m" } },
@@ -28,7 +33,13 @@ const HealthTrackerSchema = new Schema({
           unit: { type: String, default: "mm/hg" },
         },
       ],
-      diastolic: [{ value: Number, date: String, unit: { default: "mm/hg" } }],
+      diastolic: [
+        {
+          value: Number,
+          date: String,
+          unit: { type: String, default: "mm/hg" },
+        },
+      ],
     },
     bodyTemperature: [
       {
@@ -293,6 +304,9 @@ const HealthTrackerSchema = new Schema({
   },
 });
 
-const HealthTracker = mongoose.model("HealthTracker", HealthTrackerSchema);
+const HealthTrackerValues = mongoose.model(
+  "HealthTrackerValues",
+  HealthTrackerValuesSchema
+);
 
-module.exports = HealthTracker;
+export default HealthTrackerValues;
