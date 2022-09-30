@@ -22,7 +22,7 @@ const HealthTrackerValuesSchema = new Schema({
     ],
   },
   circulatoryHealth: {
-    heartRate: [
+    pulse: [
       { value: Number, date: String, unit: { type: String, default: "bpm" } },
     ],
     bloodPressure: {
@@ -84,7 +84,7 @@ const HealthTrackerValuesSchema = new Schema({
       },
     ],
   },
-  measurements: {
+  bodyMeasurements: {
     weight: [
       {
         value: Number,
@@ -122,8 +122,15 @@ const HealthTrackerValuesSchema = new Schema({
         unit: { type: String, default: "mg/dL" },
       },
     ],
-    HbA1c: {
-      recordedInlastTwelceMonths: {
+    bloodKetone: [
+      {
+        value: Number,
+        date: String,
+        unit: { type: String, default: "mg/dL" },
+      },
+    ],
+    hbA1c: {
+      recordedInLastTwelveMonths: {
         value: Boolean,
         date: String,
         default: false,
@@ -156,6 +163,13 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "mg/dL" },
+      },
+    ],
+    insulin: [
+      {
+        value: Number,
+        date: String,
+        unit: { type: String, default: "IU" },
       },
     ],
     retinalScanInLastTwelveMonths: {
@@ -207,6 +221,13 @@ const HealthTrackerValuesSchema = new Schema({
         unit: { type: String, default: "days" },
       },
     ],
+    daysOfChestPain: [
+      {
+        value: Number,
+        date: String,
+        unit: { type: String, default: "days" },
+      },
+    ],
   },
   stopSmoking: {
     cigarettesPerDay: [
@@ -236,7 +257,7 @@ const HealthTrackerValuesSchema = new Schema({
       },
     ],
     startDateOfStopSmokingProgram: {
-      value: String,
+      value: { type: String, default: "N/A" },
       date: String,
     },
   },

@@ -1,26 +1,31 @@
-import { filterSummaryData } from "../utils.js";
+import {
+  filterBodyMeasurements,
+  filterCirculatoryHealth,
+  filterDrinkLess,
+  filterFitnessData,
+  filterMyDiabetes,
+  filterMyHeartHealth,
+  filterMyHypertension,
+  filterMyMood,
+  filterMyPain,
+  filterNutritionData,
+  filterRespiratoryHealth,
+  filterStopSmoking,
+} from "../utils.js";
 
-export const healthTrackerParser = async (validicData, dbData) => {
-  //   console.log(validicData, "healthTrackerParser");
-  // console.log(dbData, "healthTrackerParser");
-
+export const healthTrackerParser = (validicData, dbData) => {
   return {
-    summary: filterSummaryData(validicData, dbData),
-    // {
-    //   steps: [dbData.steps.contact(validicData.data)],
-    //   distance: [],
-    //   energyBurned: [],
-    //   restingHeartRate: [],
-    // },
-    circulatoryHealth: [],
-    respiratoryHealth: [],
-    measurements: [],
-    myDiabetes: [],
-    myHypertension: [],
-    myHeartHealth: [],
-    stopSmoking: [],
-    myPain: [],
-    drinkLess: [],
-    myMood: [],
+    fitness: filterFitnessData(validicData, dbData),
+    nutrition: filterNutritionData(validicData),
+    circulatoryHealth: filterCirculatoryHealth(validicData, dbData),
+    respiratoryHealth: filterRespiratoryHealth(validicData, dbData),
+    bodyMeasurements: filterBodyMeasurements(validicData, dbData),
+    myDiabetes: filterMyDiabetes(validicData, dbData),
+    myHypertension: filterMyHypertension(validicData, dbData),
+    myHeartHealth: filterMyHeartHealth(validicData, dbData),
+    stopSmoking: filterStopSmoking(dbData),
+    myPain: filterMyPain(dbData),
+    drinkLess: filterDrinkLess(dbData),
+    myMood: filterMyMood(dbData),
   };
 };

@@ -119,11 +119,9 @@ export async function parsedTrackerData(req, res) {
   const { uid, PASID } = req.body;
   const validicData = await getValidicFitnessData(uid);
   const dbTrackerData = await getTrackerMeasurements(PASID);
+  const parsedTrackingData = healthTrackerParser(validicData, dbTrackerData);
 
-  // console.log(dbTrackerData);
-  // console.log(validicData, "123");
-  // healthTrackerParser(validicData, dbTrackerData);
-  console.log(healthTrackerParser(validicData, dbTrackerData));
+  console.log(parsedTrackingData, "tracking data");
 
-  res.send(validicData);
+  res.send(parsedTrackingData);
 }
