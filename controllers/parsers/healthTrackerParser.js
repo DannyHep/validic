@@ -8,6 +8,7 @@ import {
   filterMyHypertension,
   filterMyMood,
   filterMyPain,
+  filterMySleep,
   filterNutritionData,
   filterRespiratoryHealth,
   filterStopSmoking,
@@ -27,5 +28,6 @@ export const healthTrackerParser = (validicData, dbData) => {
     myPain: filterMyPain(dbData),
     drinkLess: filterDrinkLess(dbData),
     myMood: filterMyMood(dbData),
+    mySleep: filterMySleep(validicData),
   };
 };

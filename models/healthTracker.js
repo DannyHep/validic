@@ -3,13 +3,14 @@ const Schema = mongoose.Schema;
 
 const HealthTrackerValuesSchema = new Schema({
   PASID: String,
-  summary: {
+  fitness: {
     steps: [
       {
         value: Number,
         date: String,
         unit: { type: String, default: "steps" },
       },
+      { timeStamps: true },
     ],
     distance: [
       { value: Number, date: String, unit: { type: String, default: "m" } },

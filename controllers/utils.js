@@ -24,8 +24,8 @@ export const filterFitnessData = (validicData, dbData) => {
   });
 
   const combineDbValidic = (validicData, dbData, type) => {
-    return [...validicData, ...dbData?.summary[type]].sort((a, b) => {
-      return a.date - b.date;
+    return [...validicData, ...dbData?.fitness[type]].sort((a, b) => {
+      return new Date(a.date) - new Date(b.date);
     });
   };
 
@@ -89,7 +89,7 @@ export const filterNutritionData = (validicData) => {
 
   const combineAndSortDbValidic = (validicData) => {
     return validicData.sort((a, b) => {
-      return a.date - b.date;
+      return new Date(a.date) - new Date(b.date);
     });
   };
 
@@ -102,7 +102,7 @@ export const filterNutritionData = (validicData) => {
     protein: combineAndSortDbValidic(validicProtein),
     saturatedFat: combineAndSortDbValidic(validicSaturatedFat),
     unSaturatedFat: combineAndSortDbValidic(validicUnSaturatedFat),
-    Sodium: combineAndSortDbValidic(validicSodium),
+    sodium: combineAndSortDbValidic(validicSodium),
     sugars: combineAndSortDbValidic(validicSugars),
     water: combineAndSortDbValidic(validicWater),
   };
@@ -139,12 +139,12 @@ export const filterCirculatoryHealth = (validicData, dbData) => {
         ...validicData,
         ...dbData?.circulatoryHealth.bloodPressure[type],
       ].sort((a, b) => {
-        return a.date - b.date;
+        return new Date(a.date) - new Date(b.date);
       });
     } else {
       return [...validicData, ...dbData?.circulatoryHealth[type]].sort(
         (a, b) => {
-          return a.date - b.date;
+          return new Date(a.date) - new Date(b.date);
         }
       );
     }
@@ -180,7 +180,7 @@ export const filterRespiratoryHealth = (validicData, dbData) => {
 
   const combineDbValidic2 = (validicData, dbData, type) => {
     return [...validicData, ...dbData?.respiratoryHealth[type]].sort((a, b) => {
-      return a.date - b.date;
+      return new Date(a.date) - new Date(b.date);
     });
   };
 
@@ -234,12 +234,12 @@ export const filterBodyMeasurements = (validicData, dbData) => {
     if (dbData) {
       return [...validicData, ...dbData?.bodyMeasurements[type]].sort(
         (a, b) => {
-          return a.date - b.date;
+          return new Date(a.date) - new Date(b.date);
         }
       );
     } else {
       return validicData.sort((a, b) => {
-        return a.date - b.date;
+        return new Date(a.date) - new Date(b.date);
       });
     }
   };
@@ -297,11 +297,11 @@ export const filterMyDiabetes = (validicData, dbData) => {
         ...validicData,
         ...dbData?.circulatoryHealth.bloodPressure[type],
       ].sort((a, b) => {
-        return a.date - b.date;
+        return new Date(a.date) - new Date(b.date);
       });
     } else {
       return [...validicData, ...dbData?.myDiabetes[type]].sort((a, b) => {
-        return a.date - b.date;
+        return new Date(a.date) - new Date(b.date);
       });
     }
   };
@@ -361,21 +361,21 @@ export const filterMyHypertension = (validicData, dbData) => {
         ...validicData,
         ...dbData?.circulatoryHealth.bloodPressure[type],
       ].sort((a, b) => {
-        return a.date - b.date;
+        return new Date(a.date) - new Date(b.date);
       });
     } else if (type === "totalCholesterol") {
       return [...validicData, ...dbData?.myDiabetes[type]].sort((a, b) => {
-        return a.date - b.date;
+        return new Date(a.date) - new Date(b.date);
       });
     } else if (type === "waistCircumference") {
       return [...validicData, ...dbData?.bodyMeasurements[type]].sort(
         (a, b) => {
-          return a.date - b.date;
+          return new Date(a.date) - new Date(b.date);
         }
       );
     } else {
       return [...validicData, ...dbData?.myHypertension[type]].sort((a, b) => {
-        return a.date - b.date;
+        return new Date(a.date) - new Date(b.date);
       });
     }
   };
@@ -433,21 +433,21 @@ export const filterMyHeartHealth = (validicData, dbData) => {
         ...validicData,
         ...dbData?.circulatoryHealth.bloodPressure[type],
       ].sort((a, b) => {
-        return a.date - b.date;
+        return new Date(a.date) - new Date(b.date);
       });
     } else if (type === "totalCholesterol") {
       return [...validicData, ...dbData?.myDiabetes[type]].sort((a, b) => {
-        return a.date - b.date;
+        return new Date(a.date) - new Date(b.date);
       });
     } else if (type === "waistCircumference" || type === "weight") {
       return [...validicData, ...dbData?.bodyMeasurements[type]].sort(
         (a, b) => {
-          return a.date - b.date;
+          return new Date(a.date) - new Date(b.date);
         }
       );
     } else {
       return [...validicData, ...dbData?.myHypertension[type]].sort((a, b) => {
-        return a.date - b.date;
+        return new Date(a.date) - new Date(b.date);
       });
     }
   };
@@ -474,6 +474,65 @@ export const filterMyHeartHealth = (validicData, dbData) => {
     daysOfBreathlessness: dbData?.myHeartHealth.daysOfBreathlessness,
     daysOfSwollenAnkles: dbData?.myHeartHealth.daysOfSwollenAnkles,
     daysOfChestPain: dbData?.myHeartHealth.daysOfChestPain,
+  };
+};
+
+export const filterMySleep = (validicData, dbData) => {
+  const validicAwakeCount = [];
+  const validicAwakeDuration = [];
+  const validicDeepSleep = [];
+  const validicHeartRateVariability = [];
+  const validicInBedDuration = [];
+  const validicLightSleep = [];
+  const validicRemSleep = [];
+  const validicSleepDuration = [];
+  const validicSleepScore = [];
+
+  validicData.sleep?.data.map((data) => {
+    data?.metrics.map((metric) => {
+      const values = {
+        value: metric.value,
+        unit: metric.unit,
+        date: data.end_time,
+      };
+      if (metric.type === "awake_count") {
+        validicAwakeCount.push(values);
+      } else if (metric.type === "awake_duration") {
+        validicAwakeDuration.push(values);
+      } else if (metric.type === "deep_sleep") {
+        validicDeepSleep.push(values);
+      } else if (metric.type === "heart_rate_variability") {
+        validicHeartRateVariability.push(values);
+      } else if (metric.type === "in_bed_duration") {
+        validicInBedDuration.push(values);
+      } else if (metric.type === "light_sleep") {
+        validicLightSleep.push(values);
+      } else if (metric.type === "rem_sleep") {
+        validicRemSleep.push(values);
+      } else if (metric.type === "sleep_duration") {
+        validicSleepDuration.push(values);
+      } else if (metric.type === "sleep_score") {
+        validicSleepScore.push(values);
+      }
+    });
+  });
+
+  const combineDbValidic = (validicData) => {
+    return validicData.sort((a, b) => {
+      return new Date(a.date) - new Date(b.date);
+    });
+  };
+
+  return {
+    sleepScore: combineDbValidic(validicSleepScore),
+    inBedDuration: combineDbValidic(validicInBedDuration),
+    sleepDuration: combineDbValidic(validicSleepDuration),
+    awakeCount: combineDbValidic(validicAwakeCount),
+    awakeDuration: combineDbValidic(validicAwakeDuration),
+    lightSleep: combineDbValidic(validicLightSleep),
+    deepSleep: combineDbValidic(validicDeepSleep),
+    remSleep: combineDbValidic(validicRemSleep),
+    heartRateVariability: combineDbValidic(validicHeartRateVariability),
   };
 };
 

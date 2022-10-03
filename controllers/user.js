@@ -115,13 +115,30 @@ export async function getTrackerMeasurements(PASID) {
   }
 }
 
+export async function addTrackerData(req, res) {
+  const { selectedDataType, pasID, data, selectedCategory } = req.body;
+  console.log(data);
+  const trackerMeasurements = await HealthTrackerValues.findOne({
+    PASID: pasID,
+  });
+
+  trackerMeasurements[selectedCategory][selectedDataType] = [
+    ...trackerMeasurements[selectedCategory][selectedDataType],
+    data,
+  ];
+
+  const updatedValue = await trackerMeasurements.save();
+
+  res.send(updatedValue);
+}
+
 export async function parsedTrackerData(req, res) {
   const { uid, PASID } = req.body;
   const validicData = await getValidicFitnessData(uid);
   const dbTrackerData = await getTrackerMeasurements(PASID);
   const parsedTrackingData = healthTrackerParser(validicData, dbTrackerData);
 
-  console.log(parsedTrackingData, "tracking data");
+  // console.log(parsedTrackingData, "tracking data");
 
   res.send(parsedTrackingData);
 }
