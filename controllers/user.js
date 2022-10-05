@@ -118,6 +118,8 @@ export async function getTrackerMeasurements(PASID) {
 export async function addTrackerData(req, res) {
   const { selectedDataType, pasID, data, selectedCategory } = req.body;
   console.log(data, selectedDataType);
+  console.log(selectedDataType);
+
   const trackerMeasurements = await HealthTrackerValues.findOne({
     PASID: pasID,
   });
