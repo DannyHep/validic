@@ -133,7 +133,7 @@ export const filterCirculatoryHealth = (validicData, dbData) => {
     });
   });
 
-  const combineDbValidic2 = (validicData, dbData, type) => {
+  const combineDbValidic = (validicData, dbData, type) => {
     if (type === "systolic" || type === "diastolic") {
       return [
         ...validicData,
@@ -151,10 +151,12 @@ export const filterCirculatoryHealth = (validicData, dbData) => {
   };
 
   return {
-    pulse: combineDbValidic2(validicPulse, dbData, "pulse"),
-    systolic: combineDbValidic2(validicSystolic, dbData, "systolic"),
-    diastolic: combineDbValidic2(validicDiastolic, dbData, "diastolic"),
-    bodyTemperature: combineDbValidic2(
+    pulse: combineDbValidic(validicPulse, dbData, "pulse"),
+    bloodPressure: {
+      systolic: combineDbValidic(validicSystolic, dbData, "systolic"),
+      diastolic: combineDbValidic(validicDiastolic, dbData, "diastolic"),
+    },
+    bodyTemperature: combineDbValidic(
       validicBodyTemperature,
       dbData,
       "bodyTemperature"
@@ -178,14 +180,14 @@ export const filterRespiratoryHealth = (validicData, dbData) => {
     });
   });
 
-  const combineDbValidic2 = (validicData, dbData, type) => {
+  const combineDbValidic = (validicData, dbData, type) => {
     return [...validicData, ...dbData?.respiratoryHealth[type]].sort((a, b) => {
       return new Date(a.date) - new Date(b.date);
     });
   };
 
   return {
-    sp02: combineDbValidic2(validicSp02, dbData, "sp02"),
+    sp02: combineDbValidic(validicSp02, dbData, "sp02"),
     smokedLastSevenDays: dbData?.respiratoryHealth["smokedLastSevenDays"],
     respirationRate: dbData?.respiratoryHealth["respirationRate"],
     peakExpiratoryFlow: dbData?.respiratoryHealth["peakExpiratoryFlow"],
@@ -315,8 +317,10 @@ export const filterMyDiabetes = (validicData, dbData) => {
         dbData?.myDiabetes.hbA1c.recordedInLastTwelveMonths,
       measurements: dbData?.myDiabetes.hbA1c.measurements,
     },
-    systolic: combineDbValidic(validicSystolic, dbData, "systolic"),
-    diastolic: combineDbValidic(validicDiastolic, dbData, "diastolic"),
+    bloodPressure: {
+      systolic: combineDbValidic(validicSystolic, dbData, "systolic"),
+      diastolic: combineDbValidic(validicDiastolic, dbData, "diastolic"),
+    },
     cholesterol: combineDbValidic(
       validicCholesterol,
       dbData,
@@ -382,8 +386,10 @@ export const filterMyHypertension = (validicData, dbData) => {
 
   return {
     bloodSodium: dbData?.myHypertension.bloodSodium,
-    systolic: combineDbValidic(validicSystolic, dbData, "systolic"),
-    diastolic: combineDbValidic(validicDiastolic, dbData, "diastolic"),
+    bloodPressure: {
+      systolic: combineDbValidic(validicSystolic, dbData, "systolic"),
+      diastolic: combineDbValidic(validicDiastolic, dbData, "diastolic"),
+    },
     cholesterol: combineDbValidic(
       validicCholesterol,
       dbData,
@@ -454,8 +460,10 @@ export const filterMyHeartHealth = (validicData, dbData) => {
 
   return {
     bloodSodium: dbData?.myHypertension.bloodSodium,
-    systolic: combineDbValidic(validicSystolic, dbData, "systolic"),
-    diastolic: combineDbValidic(validicDiastolic, dbData, "diastolic"),
+    bloodPressure: {
+      systolic: combineDbValidic(validicSystolic, dbData, "systolic"),
+      diastolic: combineDbValidic(validicDiastolic, dbData, "diastolic"),
+    },
     cholesterol: combineDbValidic(
       validicCholesterol,
       dbData,
