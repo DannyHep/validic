@@ -8,15 +8,25 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        source: { type: String, default: "database" },
         unit: { type: String, default: "steps" },
       },
-      { timeStamps: true },
     ],
     distance: [
-      { value: Number, date: String, unit: { type: String, default: "m" } },
+      {
+        value: Number,
+        date: String,
+        unit: { type: String, default: "m" },
+        source: { type: String, default: "database" },
+      },
     ],
     energyBurned: [
-      { value: Number, date: String, unit: { type: String, default: "kcal" } },
+      {
+        value: Number,
+        date: String,
+        unit: { type: String, default: "kcal" },
+        source: { type: String, default: "database" },
+      },
     ],
     restingHeartRate: [
       { value: Number, date: String, unit: { type: String, default: "bpm" } },
@@ -24,7 +34,12 @@ const HealthTrackerValuesSchema = new Schema({
   },
   circulatoryHealth: {
     pulse: [
-      { value: Number, date: String, unit: { type: String, default: "bpm" } },
+      {
+        value: Number,
+        date: String,
+        unit: { type: String, default: "bpm" },
+        source: { type: String, default: "database" },
+      },
     ],
     bloodPressure: {
       systolic: [
@@ -32,6 +47,7 @@ const HealthTrackerValuesSchema = new Schema({
           value: Number,
           date: String,
           unit: { type: String, default: "mm/hg" },
+          source: { type: String, default: "database" },
         },
       ],
       diastolic: [
@@ -39,6 +55,7 @@ const HealthTrackerValuesSchema = new Schema({
           value: Number,
           date: String,
           unit: { type: String, default: "mm/hg" },
+          source: { type: String, default: "database" },
         },
       ],
     },
@@ -47,6 +64,7 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "celcius" },
+        source: { type: String, default: "database" },
       },
     ],
   },
@@ -56,12 +74,14 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "%" },
+        source: { type: String, default: "database" },
       },
     ],
     smokedLastSevenDays: [
       {
         value: String,
         date: String,
+        source: { type: String, default: "database" },
       },
     ],
     respirationRate: [
@@ -69,6 +89,7 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "breaths per minute" },
+        source: { type: String, default: "database" },
       },
     ],
     peakExpiratoryFlow: [
@@ -76,12 +97,14 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "%" },
+        source: { type: String, default: "database" },
       },
     ],
     degreeOfBreathlessness: [
       {
         value: String,
         date: String,
+        source: { type: String, default: "database" },
       },
     ],
   },
@@ -98,6 +121,7 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "cm" },
+        source: { type: String, default: "database" },
       },
     ],
     height: [
@@ -105,6 +129,7 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "cm" },
+        source: { type: String, default: "database" },
       },
     ],
     bmi: [
@@ -112,6 +137,7 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "kg" },
+        source: { type: String, default: "database" },
       },
     ],
   },
@@ -121,6 +147,7 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "mg/dL" },
+        source: { type: String, default: "database" },
       },
     ],
     bloodKetone: [
@@ -128,28 +155,32 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "mg/dL" },
+        source: { type: String, default: "database" },
       },
     ],
-    hbA1c: {
-      recordedInLastTwelveMonths: {
-        value: Boolean,
-        date: String,
-        default: false,
-      },
+    hbA1c:
+      // recordedInLastTwelveMonths: {
+      //   value: Boolean,
+      //   date: String,
+      //   default: false,
+      // },
 
-      measurements: [
+      // measurements:
+      [
         {
           value: Number,
           date: String,
           unit: { type: String, default: "%" },
+          source: { type: String, default: "database" },
         },
       ],
-    },
+
     totalCholesterol: [
       {
         value: Number,
         date: String,
         unit: { type: String, default: "mg/dL" },
+        source: { type: String, default: "database" },
       },
     ],
     ldlCholesterol: [
@@ -157,6 +188,7 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "mg/dL" },
+        source: { type: String, default: "database" },
       },
     ],
     hdlCholesterol: [
@@ -164,6 +196,7 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "mg/dL" },
+        source: { type: String, default: "database" },
       },
     ],
     insulin: [
@@ -171,17 +204,20 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "IU" },
+        source: { type: String, default: "database" },
       },
     ],
     retinalScanInLastTwelveMonths: {
       value: Boolean,
       date: String,
       default: false,
+      source: { type: String, default: "database" },
     },
     footScanInLastTwelveMonths: {
       value: Boolean,
       date: String,
       default: false,
+      source: { type: String, default: "database" },
     },
   },
   myHypertension: {
@@ -190,6 +226,7 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "mEq/L" },
+        source: { type: String, default: "database" },
       },
     ],
   },
@@ -199,6 +236,7 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "mL/min" },
+        source: { type: String, default: "database" },
       },
     ],
     bloodCreatinine: [
@@ -206,6 +244,7 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "mg/dL" },
+        source: { type: String, default: "database" },
       },
     ],
     daysOfBreathlessness: [
@@ -213,6 +252,7 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "days" },
+        source: { type: String, default: "database" },
       },
     ],
     daysOfSwollenAnkles: [
@@ -220,6 +260,7 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "days" },
+        source: { type: String, default: "database" },
       },
     ],
     daysOfChestPain: [
@@ -227,6 +268,7 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "days" },
+        source: { type: String, default: "database" },
       },
     ],
   },
@@ -237,29 +279,34 @@ const HealthTrackerValuesSchema = new Schema({
         date: String,
         unit: { type: String, default: "cigarettes" },
         default: 0,
+        source: { type: String, default: "database" },
       },
     ],
     lastCigaretteTimeDate: [
       {
         value: String,
         date: String,
+        source: { type: String, default: "database" },
       },
     ],
     usingNicotineReplacement: [
       {
         value: Boolean,
         date: String,
+        source: { type: String, default: "database" },
       },
     ],
     morningTimeToFirstCigarette: [
       {
         value: String,
         date: String,
+        source: { type: String, default: "database" },
       },
     ],
     startDateOfStopSmokingProgram: {
       value: { type: String, default: "N/A" },
       date: String,
+      source: { type: String, default: "database" },
     },
   },
   myPain: {
@@ -268,6 +315,7 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "days" },
+        source: { type: String, default: "database" },
       },
     ],
     numDaysSeverePain: [
@@ -275,12 +323,14 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "days" },
+        source: { type: String, default: "database" },
       },
     ],
     degreeOfPain: [
       {
         value: Number,
         date: String,
+        source: { type: String, default: "database" },
       },
     ],
   },
@@ -291,6 +341,7 @@ const HealthTrackerValuesSchema = new Schema({
         date: String,
         unit: { type: String, default: "units" },
         default: 0,
+        source: { type: String, default: "database" },
       },
     ],
     hadADrinkToday: [
@@ -298,6 +349,7 @@ const HealthTrackerValuesSchema = new Schema({
         value: Boolean,
         date: String,
         default: false,
+        source: { type: String, default: "database" },
       },
     ],
     alcoholFreeDays: [
@@ -306,6 +358,7 @@ const HealthTrackerValuesSchema = new Schema({
         date: String,
         unit: { type: String, default: "days" },
         default: 0,
+        source: { type: String, default: "database" },
       },
     ],
   },
@@ -315,12 +368,14 @@ const HealthTrackerValuesSchema = new Schema({
         value: Number,
         date: String,
         unit: { type: String, default: "days" },
+        source: { type: String, default: "database" },
       },
     ],
     moodScale: [
       {
         value: Number,
         date: String,
+        source: { type: String, default: "database" },
       },
     ],
   },

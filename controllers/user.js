@@ -116,9 +116,10 @@ export async function getTrackerMeasurements(PASID) {
 }
 
 export async function addTrackerData(req, res) {
-  const { selectedDataType, pasID, data, selectedCategory } = req.body;
-  console.log(data, selectedDataType);
-  console.log(selectedDataType);
+  const { selectedDataType, pasID, newData, selectedCategory } = req.body;
+
+  // const date = new Date (data.date, data.time )
+  console.log(newData)
 
   const trackerMeasurements = await HealthTrackerValues.findOne({
     PASID: pasID,
@@ -127,16 +128,16 @@ export async function addTrackerData(req, res) {
   if (selectedDataType === "bloodPressure") {
     trackerMeasurements[selectedCategory].bloodPressure.systolic = [
       ...trackerMeasurements[selectedCategory].bloodPressure.systolic,
-      { value: data.value.systolic, date: data.date, time: data.time },
+      { value: newData.value.systolic, date: newData.date },
     ];
     trackerMeasurements[selectedCategory].bloodPressure.diastolic = [
       ...trackerMeasurements[selectedCategory].bloodPressure.diastolic,
-      { value: data.value.diastolic, date: data.date, time: data.time },
+      { value: newData.value.diastolic, date: newData.date },
     ];
   } else {
     trackerMeasurements[selectedCategory][selectedDataType] = [
       ...trackerMeasurements[selectedCategory][selectedDataType],
-      data,
+      newData,
     ];
   }
 
