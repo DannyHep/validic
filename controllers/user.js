@@ -124,10 +124,14 @@ export async function addTrackerData(req, res) {
     PASID: pasID,
   });
 
-  if (selectedDataType === "systolic" || selectedDataType === "diastolic") {
-    trackerMeasurements[selectedCategory].bloodPressure[selectedDataType] = [
-      ...trackerMeasurements[selectedCategory].bloodPressure[selectedDataType],
-      data,
+  if (selectedDataType === "bloodPressure") {
+    trackerMeasurements[selectedCategory].bloodPressure.systolic = [
+      ...trackerMeasurements[selectedCategory].bloodPressure.systolic,
+      { value: data.value.systolic, date: data.date, time: data.time },
+    ];
+    trackerMeasurements[selectedCategory].bloodPressure.diastolic = [
+      ...trackerMeasurements[selectedCategory].bloodPressure.diastolic,
+      { value: data.value.diastolic, date: data.date, time: data.time },
     ];
   } else {
     trackerMeasurements[selectedCategory][selectedDataType] = [
