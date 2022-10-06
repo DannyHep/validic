@@ -251,7 +251,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
-        unit: { type: String, default: "days" },
+        unit: { type: String, default: "day(s)" },
         source: { type: String, default: "database" },
       },
     ],
@@ -259,7 +259,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
-        unit: { type: String, default: "days" },
+        unit: { type: String, default: "day(s)" },
         source: { type: String, default: "database" },
       },
     ],
@@ -267,7 +267,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
-        unit: { type: String, default: "days" },
+        unit: { type: String, default: "day(s)" },
         source: { type: String, default: "database" },
       },
     ],
@@ -314,7 +314,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
-        unit: { type: String, default: "days" },
+        unit: { type: String, default: "day(s)" },
         source: { type: String, default: "database" },
       },
     ],
@@ -322,7 +322,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
-        unit: { type: String, default: "days" },
+        unit: { type: String, default: "day(s)" },
         source: { type: String, default: "database" },
       },
     ],
@@ -356,7 +356,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
-        unit: { type: String, default: "days" },
+        unit: { type: String, default: "day(s)" },
         default: 0,
         source: { type: String, default: "database" },
       },
@@ -367,7 +367,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
-        unit: { type: String, default: "days" },
+        unit: { type: String, default: "day(s)" },
         source: { type: String, default: "database" },
       },
     ],
