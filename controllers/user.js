@@ -103,7 +103,6 @@ export async function createTrackerMeasurements(req, res) {
 }
 
 export async function getTrackerMeasurements(PASID) {
-  // const { PASID } = req.body;
 
   try {
     const trackerMeasurements = await HealthTrackerValues.findOne({
@@ -117,9 +116,6 @@ export async function getTrackerMeasurements(PASID) {
 
 export async function addTrackerData(req, res) {
   const { selectedDataType, pasID, newData, selectedCategory } = req.body;
-
-  // const date = new Date (data.date, data.time )
-  console.log(newData)
 
   const trackerMeasurements = await HealthTrackerValues.findOne({
     PASID: pasID,
@@ -142,7 +138,6 @@ export async function addTrackerData(req, res) {
   }
 
   const updatedValue = await trackerMeasurements.save();
-
   res.send(updatedValue);
 }
 
@@ -152,7 +147,6 @@ export async function parsedTrackerData(req, res) {
   const dbTrackerData = await getTrackerMeasurements(PASID);
   const parsedTrackingData = healthTrackerParser(validicData, dbTrackerData);
 
-  // console.log(parsedTrackingData, "tracking data");
 
   res.send(parsedTrackingData);
 }

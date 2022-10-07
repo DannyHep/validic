@@ -17,7 +17,7 @@ import {
 export const healthTrackerParser = (validicData, dbData) => {
   return {
     fitness: filterFitnessData(validicData, dbData),
-    nutrition: filterNutritionData(validicData),
+    nutrition: filterNutritionData(validicData, dbData),
     circulatoryHealth: filterCirculatoryHealth(validicData, dbData),
     respiratoryHealth: filterRespiratoryHealth(validicData, dbData),
     bodyMeasurements: filterBodyMeasurements(validicData, dbData),

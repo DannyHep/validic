@@ -41,7 +41,7 @@ export const filterFitnessData = (validicData, dbData) => {
   };
 };
 
-export const filterNutritionData = (validicData) => {
+export const filterNutritionData = (validicData, dbData) => {
   const validicCalcium = [];
   const validicCarbohydrate = [];
   const validicDietaryFiber = [];
@@ -87,24 +87,44 @@ export const filterNutritionData = (validicData) => {
     });
   });
 
-  const combineAndSortDbValidic = (validicData) => {
-    return validicData.sort((a, b) => {
+  const combineAndSortDbValidic = (validicData, dbData, type) => {
+    return [...validicData, ...dbData?.nutrition[type]].sort((a, b) => {
       return new Date(a.date) - new Date(b.date);
     });
   };
 
   return {
-    calcium: combineAndSortDbValidic(validicCalcium),
-    carbohydrate: combineAndSortDbValidic(validicCarbohydrate),
-    dietaryFiber: combineAndSortDbValidic(validicDietaryFiber),
-    energyConsumed: combineAndSortDbValidic(validicEnergyConsumed),
-    fat: combineAndSortDbValidic(validicFat),
-    protein: combineAndSortDbValidic(validicProtein),
-    saturatedFat: combineAndSortDbValidic(validicSaturatedFat),
-    unSaturatedFat: combineAndSortDbValidic(validicUnSaturatedFat),
-    sodium: combineAndSortDbValidic(validicSodium),
-    sugars: combineAndSortDbValidic(validicSugars),
-    water: combineAndSortDbValidic(validicWater),
+    calcium: combineAndSortDbValidic(validicCalcium, dbData, "calcium"),
+    carbohydrate: combineAndSortDbValidic(
+      validicCarbohydrate,
+      dbData,
+      "carbohydrate"
+    ),
+    dietaryFiber: combineAndSortDbValidic(
+      validicDietaryFiber,
+      dbData,
+      "dietaryFiber"
+    ),
+    energyConsumed: combineAndSortDbValidic(
+      validicEnergyConsumed,
+      dbData,
+      "energyConsumed"
+    ),
+    fat: combineAndSortDbValidic(validicFat, dbData, "fat"),
+    protein: combineAndSortDbValidic(validicProtein, dbData, "protein"),
+    saturatedFat: combineAndSortDbValidic(
+      validicSaturatedFat,
+      dbData,
+      "saturatedFat"
+    ),
+    unSaturatedFat: combineAndSortDbValidic(
+      validicUnSaturatedFat,
+      dbData,
+      "unSaturatedFat"
+    ),
+    sodium: combineAndSortDbValidic(validicSodium, dbData, "sodium"),
+    sugars: combineAndSortDbValidic(validicSugars, dbData, "sugars"),
+    water: combineAndSortDbValidic(validicWater, dbData, "water"),
   };
 };
 
@@ -321,11 +341,7 @@ export const filterMyDiabetes = (validicData, dbData) => {
       systolic: combineDbValidic(validicSystolic, dbData, "systolic"),
       diastolic: combineDbValidic(validicDiastolic, dbData, "diastolic"),
     },
-    cholesterol: combineDbValidic(
-      validicCholesterol,
-      dbData,
-      "totalCholesterol"
-    ),
+    cholesterol: combineDbValidic(validicCholesterol, dbData, "cholesterol"),
     ldlCholesterol: dbData?.myDiabetes.ldlCholesterol,
     hdlCholesterol: dbData?.myDiabetes.hdlCholesterol,
     retinalScanInLastTwelveMonths:
@@ -367,7 +383,7 @@ export const filterMyHypertension = (validicData, dbData) => {
       ].sort((a, b) => {
         return new Date(a.date) - new Date(b.date);
       });
-    } else if (type === "totalCholesterol") {
+    } else if (type === "cholesterol") {
       return [...validicData, ...dbData?.myDiabetes[type]].sort((a, b) => {
         return new Date(a.date) - new Date(b.date);
       });
@@ -385,16 +401,12 @@ export const filterMyHypertension = (validicData, dbData) => {
   };
 
   return {
-    bloodSodium: dbData?.myHypertension.bloodSodium,
+    bloodSodium: combineDbValidic(validicSystolic, dbData, "bloodSodium"),
     bloodPressure: {
       systolic: combineDbValidic(validicSystolic, dbData, "systolic"),
       diastolic: combineDbValidic(validicDiastolic, dbData, "diastolic"),
     },
-    cholesterol: combineDbValidic(
-      validicCholesterol,
-      dbData,
-      "totalCholesterol"
-    ),
+    cholesterol: combineDbValidic(validicCholesterol, dbData, "cholesterol"),
     ldlCholesterol: dbData?.myDiabetes.ldlCholesterol,
     hdlCholesterol: dbData?.myDiabetes.hdlCholesterol,
     waistCircumference: combineDbValidic(
@@ -441,8 +453,12 @@ export const filterMyHeartHealth = (validicData, dbData) => {
       ].sort((a, b) => {
         return new Date(a.date) - new Date(b.date);
       });
-    } else if (type === "totalCholesterol") {
+    } else if (type === "cholesterol") {
       return [...validicData, ...dbData?.myDiabetes[type]].sort((a, b) => {
+        return new Date(a.date) - new Date(b.date);
+      });
+    } else if (type === "bloodSodium") {
+      return [...validicData, ...dbData?.myHypertension[type]].sort((a, b) => {
         return new Date(a.date) - new Date(b.date);
       });
     } else if (type === "waistCircumference" || type === "weight") {
@@ -459,16 +475,12 @@ export const filterMyHeartHealth = (validicData, dbData) => {
   };
 
   return {
-    bloodSodium: dbData?.myHypertension.bloodSodium,
+    bloodSodium: combineDbValidic(validicSystolic, dbData, "bloodSodium"),
     bloodPressure: {
       systolic: combineDbValidic(validicSystolic, dbData, "systolic"),
       diastolic: combineDbValidic(validicDiastolic, dbData, "diastolic"),
     },
-    cholesterol: combineDbValidic(
-      validicCholesterol,
-      dbData,
-      "totalCholesterol"
-    ),
+    cholesterol: combineDbValidic(validicCholesterol, dbData, "cholesterol"),
     ldlCholesterol: dbData?.myDiabetes.ldlCholesterol,
     hdlCholesterol: dbData?.myDiabetes.hdlCholesterol,
     waistCircumference: combineDbValidic(

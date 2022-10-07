@@ -32,6 +32,85 @@ const HealthTrackerValuesSchema = new Schema({
       { value: Number, date: String, unit: { type: String, default: "bpm" } },
     ],
   },
+  nutrition: {
+    calcium: [
+      {
+        value: Number,
+        date: String,
+        unit: { type: String, default: "mg/dl" },
+      },
+    ],
+    carbohydrate: [
+      {
+        value: Number,
+        date: String,
+        unit: { type: String, default: "g" },
+      },
+    ],
+    dietaryFiber: [
+      {
+        value: Number,
+        date: String,
+        unit: { type: String, default: "g" },
+      },
+    ],
+    energyConsumed: [
+      {
+        value: Number,
+        date: String,
+        unit: { type: String, default: "kcal" },
+      },
+    ],
+    fat: [
+      {
+        value: Number,
+        date: String,
+        unit: { type: String, default: "g" },
+      },
+    ],
+    protein: [
+      {
+        value: Number,
+        date: String,
+        unit: { type: String, default: "g" },
+      },
+    ],
+    saturatedFat: [
+      {
+        value: Number,
+        date: String,
+        unit: { type: String, default: "g" },
+      },
+    ],
+    unSaturatedFat: [
+      {
+        value: Number,
+        date: String,
+        unit: { type: String, default: "g" },
+      },
+    ],
+    sodium: [
+      {
+        value: Number,
+        date: String,
+        unit: { type: String, default: "mg" },
+      },
+    ],
+    sugars: [
+      {
+        value: Number,
+        date: String,
+        unit: { type: String, default: "g" },
+      },
+    ],
+    water: [
+      {
+        value: Number,
+        date: String,
+        unit: { type: String, default: "ml" },
+      },
+    ],
+  },
   circulatoryHealth: {
     pulse: [
       {
@@ -174,8 +253,7 @@ const HealthTrackerValuesSchema = new Schema({
           source: { type: String, default: "database" },
         },
       ],
-
-    totalCholesterol: [
+    cholesterol: [
       {
         value: Number,
         date: String,
@@ -207,18 +285,22 @@ const HealthTrackerValuesSchema = new Schema({
         source: { type: String, default: "database" },
       },
     ],
-    retinalScanInLastTwelveMonths: {
-      value: Boolean,
-      date: String,
-      default: false,
-      source: { type: String, default: "database" },
-    },
-    footScanInLastTwelveMonths: {
-      value: Boolean,
-      date: String,
-      default: false,
-      source: { type: String, default: "database" },
-    },
+    retinalScanInLastTwelveMonths: [
+      {
+        value: Boolean,
+        date: String,
+        default: false,
+        source: { type: String, default: "database" },
+      },
+    ],
+    footScanInLastTwelveMonths: [
+      {
+        value: Boolean,
+        date: String,
+        default: false,
+        source: { type: String, default: "database" },
+      },
+    ],
   },
   myHypertension: {
     bloodSodium: [
