@@ -1,4 +1,6 @@
 import got from "got";
+import HealthTrackerValues from "../models/healthTracker.js";
+import { healthTrackerParser } from "./parsers/healthTrackerParser.js";
 
 export async function createNewUser(req, res) {
   const { uid } = req.body;
@@ -46,8 +48,8 @@ export async function getValidicProfile(req, res) {
   }
 }
 
-export async function getValidicFitnessData(req, res) {
-  const { uid } = req.body;
+export async function getValidicFitnessData(uid) {
+  // const { uid } = req.body;
   try {
     const token = process.env.VALIDIC_TOKEN;
     const orgId = process.env.NSTFS_VALIDIC_ORGID;
@@ -84,8 +86,67 @@ export async function getValidicFitnessData(req, res) {
       intraday: JSON.parse(intradayResponse.body),
     };
 
-    res.send(responseData);
+    return responseData;
   } catch (error) {
     console.log(error);
   }
+}
+
+export async function createTrackerMeasurements(req, res) {
+  const { PASID } = req.body;
+
+  const trackerMeasurements = new HealthTrackerValues({ PASID: PASID });
+
+  const response = await trackerMeasurements.save();
+
+  res.send(response);
+}
+
+export async function getTrackerMeasurements(PASID) {
+
+  try {
+    const trackerMeasurements = await HealthTrackerValues.findOne({
+      PASID: PASID,
+    });
+    return trackerMeasurements;
+  } catch (err) {
+    res.send(err);
+  }
+}
+
+export async function addTrackerData(req, res) {
+  const { selectedDataType, pasID, newData, selectedCategory } = req.body;
+
+  const trackerMeasurements = await HealthTrackerValues.findOne({
+    PASID: pasID,
+  });
+
+  if (selectedDataType === "bloodPressure") {
+    trackerMeasurements[selectedCategory].bloodPressure.systolic = [
+      ...trackerMeasurements[selectedCategory].bloodPressure.systolic,
+      { value: newData.value.systolic, date: newData.date },
+    ];
+    trackerMeasurements[selectedCategory].bloodPressure.diastolic = [
+      ...trackerMeasurements[selectedCategory].bloodPressure.diastolic,
+      { value: newData.value.diastolic, date: newData.date },
+    ];
+  } else {
+    trackerMeasurements[selectedCategory][selectedDataType] = [
+      ...trackerMeasurements[selectedCategory][selectedDataType],
+      newData,
+    ];
+  }
+
+  const updatedValue = await trackerMeasurements.save();
+  res.send(updatedValue);
+}
+
+export async function parsedTrackerData(req, res) {
+  const { uid, PASID } = req.body;
+  const validicData = await getValidicFitnessData(uid);
+  const dbTrackerData = await getTrackerMeasurements(PASID);
+  const parsedTrackingData = healthTrackerParser(validicData, dbTrackerData);
+
+
+  res.send(parsedTrackingData);
 }
