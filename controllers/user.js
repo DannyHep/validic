@@ -95,15 +95,18 @@ export async function getValidicFitnessData(uid) {
 export async function createTrackerMeasurements(req, res) {
   const { PASID } = req.body;
 
-  const trackerMeasurements = new HealthTrackerValues({ PASID: PASID });
+  try {
+    const trackerMeasurements = new HealthTrackerValues({ PASID: PASID });
 
-  const response = await trackerMeasurements.save();
+    const response = await trackerMeasurements.save();
 
-  res.send(response);
+    res.send(response);
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 export async function getTrackerMeasurements(PASID) {
-
   try {
     const trackerMeasurements = await HealthTrackerValues.findOne({
       PASID: PASID,
@@ -116,37 +119,43 @@ export async function getTrackerMeasurements(PASID) {
 
 export async function addTrackerData(req, res) {
   const { selectedDataType, pasID, newData, selectedCategory } = req.body;
+  try {
+    const trackerMeasurements = await HealthTrackerValues.findOne({
+      PASID: pasID,
+    });
 
-  const trackerMeasurements = await HealthTrackerValues.findOne({
-    PASID: pasID,
-  });
+    if (selectedDataType === "bloodPressure") {
+      trackerMeasurements[selectedCategory].bloodPressure.systolic = [
+        ...trackerMeasurements[selectedCategory].bloodPressure.systolic,
+        { value: newData.value.systolic, date: newData.date },
+      ];
+      trackerMeasurements[selectedCategory].bloodPressure.diastolic = [
+        ...trackerMeasurements[selectedCategory].bloodPressure.diastolic,
+        { value: newData.value.diastolic, date: newData.date },
+      ];
+    } else {
+      trackerMeasurements[selectedCategory][selectedDataType] = [
+        ...trackerMeasurements[selectedCategory][selectedDataType],
+        newData,
+      ];
+    }
 
-  if (selectedDataType === "bloodPressure") {
-    trackerMeasurements[selectedCategory].bloodPressure.systolic = [
-      ...trackerMeasurements[selectedCategory].bloodPressure.systolic,
-      { value: newData.value.systolic, date: newData.date },
-    ];
-    trackerMeasurements[selectedCategory].bloodPressure.diastolic = [
-      ...trackerMeasurements[selectedCategory].bloodPressure.diastolic,
-      { value: newData.value.diastolic, date: newData.date },
-    ];
-  } else {
-    trackerMeasurements[selectedCategory][selectedDataType] = [
-      ...trackerMeasurements[selectedCategory][selectedDataType],
-      newData,
-    ];
+    const updatedValue = await trackerMeasurements.save();
+    res.send(updatedValue);
+  } catch (error) {
+    console.log(error);
   }
-
-  const updatedValue = await trackerMeasurements.save();
-  res.send(updatedValue);
 }
 
 export async function parsedTrackerData(req, res) {
   const { uid, PASID } = req.body;
-  const validicData = await getValidicFitnessData(uid);
-  const dbTrackerData = await getTrackerMeasurements(PASID);
-  const parsedTrackingData = healthTrackerParser(validicData, dbTrackerData);
 
-
-  res.send(parsedTrackingData);
+  try {
+    const validicData = await getValidicFitnessData(uid);
+    const dbTrackerData = await getTrackerMeasurements(PASID);
+    const parsedTrackingData = healthTrackerParser(validicData, dbTrackerData);
+    res.send(parsedTrackingData);
+  } catch (error) {
+    console.log(error);
+  }
 }
