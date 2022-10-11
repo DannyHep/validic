@@ -25,6 +25,9 @@ app.use(cors());
 
 // routes
 app.use("/user", router);
+app.use("/", (req, res) => {
+  res.send({ success: true, msg: "Fitness tracker running" });
+});
 
 app.listen(port, () => {
   console.log(`server is running on port ${port}`);
