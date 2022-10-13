@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const HealthTrackerValuesSchema = new Schema({
-  PASID: String,
+  PASID: { type: String, unique: true },
   fitness: {
     steps: [
       {
@@ -32,85 +32,65 @@ const HealthTrackerValuesSchema = new Schema({
       { value: Number, date: String, unit: { type: String, default: "bpm" } },
     ],
   },
-  nutrition: {
-    calcium: [
-      {
+  nutrition: [
+    {
+      calcium: {
         value: Number,
-        date: String,
         unit: { type: String, default: "mg/dl" },
       },
-    ],
-    carbohydrate: [
-      {
+
+      carbohydrate: {
         value: Number,
-        date: String,
         unit: { type: String, default: "g" },
       },
-    ],
-    dietaryFiber: [
-      {
+
+      dietary_fiber: {
         value: Number,
-        date: String,
         unit: { type: String, default: "g" },
       },
-    ],
-    energyConsumed: [
-      {
+
+      energy_consumed: {
         value: Number,
-        date: String,
         unit: { type: String, default: "kcal" },
       },
-    ],
-    fat: [
-      {
+
+      fat: {
         value: Number,
-        date: String,
         unit: { type: String, default: "g" },
       },
-    ],
-    protein: [
-      {
+
+      protein: {
         value: Number,
-        date: String,
         unit: { type: String, default: "g" },
       },
-    ],
-    saturatedFat: [
-      {
+
+      saturated_fat: {
         value: Number,
-        date: String,
         unit: { type: String, default: "g" },
       },
-    ],
-    unSaturatedFat: [
-      {
+
+      unsaturated_fat: {
         value: Number,
-        date: String,
         unit: { type: String, default: "g" },
       },
-    ],
-    sodium: [
-      {
+
+      sodium: {
         value: Number,
-        date: String,
         unit: { type: String, default: "mg" },
       },
-    ],
-    sugars: [
-      {
+
+      sugars: {
         value: Number,
-        date: String,
         unit: { type: String, default: "g" },
       },
-    ],
-    water: [
-      {
+
+      water: {
         value: Number,
-        date: String,
         unit: { type: String, default: "ml" },
       },
-    ],
-  },
+      date: String,
+    },
+  ],
   circulatoryHealth: {
     pulse: [
       {

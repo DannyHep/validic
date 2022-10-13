@@ -42,89 +42,71 @@ export const filterFitnessData = (validicData, dbData) => {
 };
 
 export const filterNutritionData = (validicData, dbData) => {
-  const validicCalcium = [];
-  const validicCarbohydrate = [];
-  const validicDietaryFiber = [];
-  const validicEnergyConsumed = [];
-  const validicFat = [];
-  const validicProtein = [];
-  const validicSaturatedFat = [];
-  const validicUnSaturatedFat = [];
-  const validicSodium = [];
-  const validicSugars = [];
-  const validicWater = [];
+  const nutritionArray = [];
 
-  validicData.summary?.data.map((data) => {
-    data?.metrics.map((metric) => {
-      const values = {
-        value: metric.value,
-        unit: metric.unit,
-        date: data.end_time,
-      };
-      if (metric.type === "calcium") {
-        validicCalicum.push(values);
-      } else if (metric.type === "carbohydrate") {
-        validicCarbohydrate.push(values);
-      } else if (metric.type === "dietary_fiber") {
-        validicDietaryFiber.push(values);
-      } else if (metric.type === "energy_consumed") {
-        validicEnergyConsumed.push(values);
-      } else if (metric.type === "fat	") {
-        validicFat.push(values);
-      } else if (metric.type === "protein	") {
-        validicProtein.push(values);
-      } else if (metric.type === "saturated_fat	") {
-        validicSaturatedFat.push(values);
-      } else if (metric.type === "sodium") {
-        validicSodium.push(values);
-      } else if (metric.type === "sugars") {
-        validicSugars.push(values);
-      } else if (metric.type === "unsaturated_fat") {
-        validicUnSaturatedFat.push(values);
-      } else if (metric.type === "water") {
-        validicWater.push(values);
-      }
-    });
+  dbData.nutrition.map((dbData) => {
+    console.log(dbData);
+    // validicData.nutrition?.data.map((validicData) => {
+    //   validicData.metrics.map((metric) => {
+    //     console.log(metric.type);
+    //     if (dbData[metric.type]) {
+    //       console.log(data[metric.type]);
+    //     }
+    //   });
+    // });
+    nutritionArray.push(dbData);
   });
 
-  const combineAndSortDbValidic = (validicData, dbData, type) => {
-    return [...validicData, ...dbData?.nutrition[type]].sort((a, b) => {
-      return new Date(a.date) - new Date(b.date);
-    });
-  };
+  // validicData.nutrition?.data.map((data) => {
+  //   const dataObj = [];
+  //   data?.metrics.map((metric) => {
+  //     const value = {
+  //       name: metric.type,
+  //       value: metric.value,
+  //       unit: metric.unit,
+  //       date: data.end_time,
+  //     };
+  //     dataObj.push(value);
+  //   });
+  //   nutritionArray.push({ dataObj });
+  // });
+
+  // const dbKeysArr = Object.keys(dbData.nutrition);
+
+  // const combineAndSortDbValidic = (validicData, dbData) => {
+  //   // console.log(validicData);
+  //   // console.log(validicData)
+  //   validicData.map((data) => {
+  //     // console.log(data);
+  //     // console.log(dbData.nutrition, "here 1 ");
+  //     for (let nutritionType in dbData.nutrition) {
+  //       if (nutritionType === data.dataObj.name) {
+  //         console.log("match");
+  //       }
+  //     }
+  //     // dbData.nutrition.map((dbData) => {
+  //     //   if (dbData.date === data.date) {
+  //     //     console.log("match", dbData.date, data.date);
+  //     // }
+  //     // });
+  //   });
+
+  //   // dbData.nutrition[metric.type].map((data) => {
+  //   //   console.log(metric.type);
+  //   //   console.log(data);
+  //   // });
+  //   // nutritionArray.map((day) => {
+  //   //   console.log(dbData?.nutrition[type]);
+  //   //   dbData?.nutrition[type].map((dbType) => {});
+  //   // });
+
+  //   // return [...validicData, ...dbData?.nutrition[type]].sort((a, b) => {
+  //   //   return new Date(a.date) - new Date(b.date);
+  //   // });
+  // };
 
   return {
-    calcium: combineAndSortDbValidic(validicCalcium, dbData, "calcium"),
-    carbohydrate: combineAndSortDbValidic(
-      validicCarbohydrate,
-      dbData,
-      "carbohydrate"
-    ),
-    dietaryFiber: combineAndSortDbValidic(
-      validicDietaryFiber,
-      dbData,
-      "dietaryFiber"
-    ),
-    energyConsumed: combineAndSortDbValidic(
-      validicEnergyConsumed,
-      dbData,
-      "energyConsumed"
-    ),
-    fat: combineAndSortDbValidic(validicFat, dbData, "fat"),
-    protein: combineAndSortDbValidic(validicProtein, dbData, "protein"),
-    saturatedFat: combineAndSortDbValidic(
-      validicSaturatedFat,
-      dbData,
-      "saturatedFat"
-    ),
-    unSaturatedFat: combineAndSortDbValidic(
-      validicUnSaturatedFat,
-      dbData,
-      "unSaturatedFat"
-    ),
-    sodium: combineAndSortDbValidic(validicSodium, dbData, "sodium"),
-    sugars: combineAndSortDbValidic(validicSugars, dbData, "sugars"),
-    water: combineAndSortDbValidic(validicWater, dbData, "water"),
+    nutritionArray,
   };
 };
 
@@ -208,7 +190,6 @@ export const filterRespiratoryHealth = (validicData, dbData) => {
 
   return {
     sp02: combineDbValidic(validicSp02, dbData, "sp02"),
-    smokedLastSevenDays: dbData?.respiratoryHealth["smokedLastSevenDays"],
     respirationRate: dbData?.respiratoryHealth["respirationRate"],
     peakExpiratoryFlow: dbData?.respiratoryHealth["peakExpiratoryFlow"],
     degreeOfBreathlessness: dbData?.respiratoryHealth["degreeOfBreathlessness"],
