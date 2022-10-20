@@ -3,6 +3,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 import { router } from "./routes/user.js";
 import "dotenv/config";
+import { corsConfig } from "./config/corsConfig.js";
 
 const app = express();
 const port = process.env.PORT || 8088;
@@ -21,7 +22,7 @@ mongoose
   });
 
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsConfig));
 
 // routes
 app.use("/user", router);
