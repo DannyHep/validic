@@ -282,7 +282,6 @@ export async function parsedTrackerData(req, res) {
     const parsedTrackingData = healthTrackerParser(validicData, dbTrackerData);
     res.send(parsedTrackingData);
   } catch (error) {
-    res.send({ message: "Server Error" });
     console.log(error);
   }
 }
