@@ -2,12 +2,13 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const HealthTrackerValuesSchema = new Schema({
-  PASID: String,
+  PASID: { type: String, unique: true },
   fitness: {
     steps: [
       {
         value: Number,
         date: String,
+        time: String,
         source: { type: String, default: "database" },
         unit: { type: String, default: "steps" },
       },
@@ -16,6 +17,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "m" },
         source: { type: String, default: "database" },
       },
@@ -24,107 +26,88 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "kcal" },
         source: { type: String, default: "database" },
       },
     ],
     restingHeartRate: [
-      { value: Number, date: String, unit: { type: String, default: "bpm" } },
-    ],
-  },
-  nutrition: {
-    calcium: [
       {
         value: Number,
         date: String,
+        time: String,
+        unit: { type: String, default: "bpm" },
+      },
+    ],
+  },
+  nutrition: [
+    {
+      calcium: {
+        value: { type: Number, default: 0 },
         unit: { type: String, default: "mg/dl" },
       },
-    ],
-    carbohydrate: [
-      {
-        value: Number,
-        date: String,
+
+      carbohydrate: {
+        value: { type: Number, default: 0 },
         unit: { type: String, default: "g" },
       },
-    ],
-    dietaryFiber: [
-      {
-        value: Number,
-        date: String,
+
+      dietary_fiber: {
+        value: { type: Number, default: 0 },
         unit: { type: String, default: "g" },
       },
-    ],
-    energyConsumed: [
-      {
-        value: Number,
-        date: String,
+
+      energy_consumed: {
+        value: { type: Number, default: 0 },
         unit: { type: String, default: "kcal" },
       },
-    ],
-    fat: [
-      {
-        value: Number,
-        date: String,
+
+      fat: {
+        value: { type: Number, default: 0 },
         unit: { type: String, default: "g" },
       },
-    ],
-    protein: [
-      {
-        value: Number,
-        date: String,
+
+      protein: {
+        value: { type: Number, default: 0 },
         unit: { type: String, default: "g" },
       },
-    ],
-    saturatedFat: [
-      {
-        value: Number,
-        date: String,
+
+      saturated_fat: {
+        value: { type: Number, default: 0 },
         unit: { type: String, default: "g" },
       },
-    ],
-    unSaturatedFat: [
-      {
-        value: Number,
-        date: String,
+
+      unsaturated_fat: {
+        value: { type: Number, default: 0 },
         unit: { type: String, default: "g" },
       },
-    ],
-    sodium: [
-      {
-        value: Number,
-        date: String,
+
+      sodium: {
+        value: { type: Number, default: 0 },
         unit: { type: String, default: "mg" },
       },
-    ],
-    sugars: [
-      {
-        value: Number,
-        date: String,
+
+      sugars: {
+        value: { type: Number, default: 0 },
         unit: { type: String, default: "g" },
       },
-    ],
-    water: [
-      {
-        value: Number,
-        date: String,
+
+      water: {
+        value: { type: Number, default: 0 },
         unit: { type: String, default: "ml" },
       },
-    ],
-  },
+
+      date: String,
+      time: String,
+    },
+  ],
   circulatoryHealth: {
-    pulse: [
-      {
-        value: Number,
-        date: String,
-        unit: { type: String, default: "bpm" },
-        source: { type: String, default: "database" },
-      },
-    ],
     bloodPressure: {
       systolic: [
         {
           value: Number,
           date: String,
+          time: String,
           unit: { type: String, default: "mm/hg" },
           source: { type: String, default: "database" },
         },
@@ -133,6 +116,7 @@ const HealthTrackerValuesSchema = new Schema({
         {
           value: Number,
           date: String,
+          time: String,
           unit: { type: String, default: "mm/hg" },
           source: { type: String, default: "database" },
         },
@@ -142,6 +126,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "celcius" },
         source: { type: String, default: "database" },
       },
@@ -152,6 +137,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "%" },
         source: { type: String, default: "database" },
       },
@@ -160,6 +146,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: String,
         date: String,
+        time: String,
         source: { type: String, default: "database" },
       },
     ],
@@ -167,6 +154,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "breaths per minute" },
         source: { type: String, default: "database" },
       },
@@ -175,6 +163,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "%" },
         source: { type: String, default: "database" },
       },
@@ -183,6 +172,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: String,
         date: String,
+        time: String,
         source: { type: String, default: "database" },
       },
     ],
@@ -192,6 +182,8 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
+
         unit: { type: String, default: "kg" },
       },
     ],
@@ -199,6 +191,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "cm" },
         source: { type: String, default: "database" },
       },
@@ -207,6 +200,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "cm" },
         source: { type: String, default: "database" },
       },
@@ -215,6 +209,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "kg" },
         source: { type: String, default: "database" },
       },
@@ -225,6 +220,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "mg/dL" },
         source: { type: String, default: "database" },
       },
@@ -233,30 +229,25 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "mg/dL" },
         source: { type: String, default: "database" },
       },
     ],
-    hbA1c:
-      // recordedInLastTwelveMonths: {
-      //   value: Boolean,
-      //   date: String,
-      //   default: false,
-      // },
-
-      // measurements:
-      [
-        {
-          value: Number,
-          date: String,
-          unit: { type: String, default: "%" },
-          source: { type: String, default: "database" },
-        },
-      ],
+    hbA1c: [
+      {
+        value: Number,
+        date: String,
+        time: String,
+        unit: { type: String, default: "%" },
+        source: { type: String, default: "database" },
+      },
+    ],
     cholesterol: [
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "mg/dL" },
         source: { type: String, default: "database" },
       },
@@ -265,6 +256,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "mg/dL" },
         source: { type: String, default: "database" },
       },
@@ -273,6 +265,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "mg/dL" },
         source: { type: String, default: "database" },
       },
@@ -281,6 +274,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "IU" },
         source: { type: String, default: "database" },
       },
@@ -289,6 +283,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Boolean,
         date: String,
+        time: String,
         default: false,
         source: { type: String, default: "database" },
       },
@@ -297,6 +292,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Boolean,
         date: String,
+        time: String,
         default: false,
         source: { type: String, default: "database" },
       },
@@ -307,6 +303,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "mEq/L" },
         source: { type: String, default: "database" },
       },
@@ -317,6 +314,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "mL/min" },
         source: { type: String, default: "database" },
       },
@@ -325,6 +323,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "mg/dL" },
         source: { type: String, default: "database" },
       },
@@ -333,6 +332,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "day(s)" },
         source: { type: String, default: "database" },
       },
@@ -341,6 +341,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "day(s)" },
         source: { type: String, default: "database" },
       },
@@ -349,6 +350,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "day(s)" },
         source: { type: String, default: "database" },
       },
@@ -359,6 +361,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "cigarettes" },
         default: 0,
         source: { type: String, default: "database" },
@@ -368,6 +371,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: String,
         date: String,
+        time: String,
         source: { type: String, default: "database" },
       },
     ],
@@ -375,6 +379,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Boolean,
         date: String,
+        time: String,
         source: { type: String, default: "database" },
       },
     ],
@@ -382,12 +387,16 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: String,
         date: String,
+        time: String,
+        unit: { type: String, default: "hrs" },
         source: { type: String, default: "database" },
       },
     ],
     startDateOfStopSmokingProgram: {
       value: { type: String, default: "N/A" },
       date: String,
+      time: String,
+      unit: { type: String, default: "hrs" },
       source: { type: String, default: "database" },
     },
   },
@@ -396,6 +405,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "day(s)" },
         source: { type: String, default: "database" },
       },
@@ -404,6 +414,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "day(s)" },
         source: { type: String, default: "database" },
       },
@@ -412,6 +423,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         source: { type: String, default: "database" },
       },
     ],
@@ -421,6 +433,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "units" },
         default: 0,
         source: { type: String, default: "database" },
@@ -430,6 +443,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Boolean,
         date: String,
+        time: String,
         default: false,
         source: { type: String, default: "database" },
       },
@@ -438,6 +452,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "day(s)" },
         default: 0,
         source: { type: String, default: "database" },
@@ -449,6 +464,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         unit: { type: String, default: "day(s)" },
         source: { type: String, default: "database" },
       },
@@ -457,6 +473,7 @@ const HealthTrackerValuesSchema = new Schema({
       {
         value: Number,
         date: String,
+        time: String,
         source: { type: String, default: "database" },
       },
     ],
