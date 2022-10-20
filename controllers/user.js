@@ -30,6 +30,7 @@ export async function createNewUser(req, res) {
       success: true,
     });
   } catch (error) {
+    res.send({ message: "Server Error" });
     console.log(error, "error response");
   }
 }
@@ -44,6 +45,7 @@ export async function getValidicProfile(req, res) {
     );
     res.send(response.body);
   } catch (error) {
+    res.send({ message: "Server Error" });
     console.log(error);
   }
 }
@@ -88,6 +90,7 @@ export async function getValidicFitnessData(uid) {
 
     return responseData;
   } catch (error) {
+    res.send({ message: "Server Error" });
     console.log(error);
   }
 }
@@ -102,6 +105,7 @@ export async function createTrackerMeasurements(req, res) {
 
     res.send(response);
   } catch (error) {
+    res.send({ message: "Server Error" });
     console.log(error);
   }
 }
@@ -113,25 +117,147 @@ export async function getTrackerMeasurements(PASID) {
     });
     return trackerMeasurements;
   } catch (err) {
+    res.send({ message: "Server Error" });
     res.send(err);
   }
 }
 
 export async function addTrackerData(req, res) {
   const { selectedDataType, pasID, newData, selectedCategory } = req.body;
+
   try {
     const trackerMeasurements = await HealthTrackerValues.findOne({
       PASID: pasID,
     });
 
     if (selectedDataType === "bloodPressure") {
-      trackerMeasurements[selectedCategory].bloodPressure.systolic = [
-        ...trackerMeasurements[selectedCategory].bloodPressure.systolic,
-        { value: newData.value.systolic, date: newData.date },
+      trackerMeasurements.circulatoryHealth.bloodPressure.systolic = [
+        ...trackerMeasurements.circulatoryHealth.bloodPressure.systolic,
+        {
+          value: newData.value.systolic,
+          date: newData.date,
+          time: newData.time,
+        },
       ];
-      trackerMeasurements[selectedCategory].bloodPressure.diastolic = [
-        ...trackerMeasurements[selectedCategory].bloodPressure.diastolic,
-        { value: newData.value.diastolic, date: newData.date },
+      trackerMeasurements.circulatoryHealth.bloodPressure.diastolic = [
+        ...trackerMeasurements.circulatoryHealth.bloodPressure.diastolic,
+        {
+          value: newData.value.diastolic,
+          date: newData.date,
+          time: newData.time,
+        },
+      ];
+    } else if (selectedCategory === "fitness") {
+      if (
+        trackerMeasurements[selectedCategory][selectedDataType].find(
+          (element) => element.date === newData.date
+        )
+      ) {
+        const dbData = trackerMeasurements[selectedCategory][
+          selectedDataType
+        ].find((element) => element.date === newData.date);
+        const newValue = newData.value;
+        const newTime = newData.time;
+        dbData.value = dbData.value + newValue;
+        dbData.time = newTime;
+      } else {
+        trackerMeasurements[selectedCategory][selectedDataType] = [
+          ...trackerMeasurements[selectedCategory][selectedDataType],
+          newData,
+        ];
+      }
+    } else if (selectedCategory === "nutrition") {
+      if (
+        trackerMeasurements[selectedCategory].find(
+          (element) => element.date === newData.date
+        )
+      ) {
+        const dbData = trackerMeasurements[selectedCategory].find(
+          (element) => element.date === newData.date
+        );
+        const newValue = newData.value;
+        dbData[selectedDataType].value =
+          dbData[selectedDataType].value + newValue;
+      } else {
+        const nutritionObj = {
+          calcium: {
+            value: 0,
+            unit: "mg/dl",
+          },
+          carbohydrate: {
+            value: 0,
+            unit: "g",
+          },
+          dietary_fiber: {
+            value: 0,
+            unit: "g",
+          },
+          energy_consumed: {
+            value: 0,
+            unit: "kcal",
+          },
+          fat: {
+            value: 0,
+            unit: "g",
+          },
+          protein: {
+            value: 0,
+            unit: "g",
+          },
+          saturated_fat: {
+            value: 0,
+            unit: "g",
+          },
+          unsaturated_fat: {
+            value: 0,
+            unit: "g",
+          },
+          sodium: {
+            value: 0,
+            unit: "mg",
+          },
+          sugars: {
+            value: 0,
+            unit: "g",
+          },
+          water: {
+            value: 0,
+            unit: "ml",
+          },
+          date: newData.date,
+        };
+        nutritionObj[selectedDataType].value = newData.value;
+        trackerMeasurements[selectedCategory] = [
+          ...trackerMeasurements[selectedCategory],
+          nutritionObj,
+        ];
+      }
+    } else if (selectedDataType == "bloodSodium") {
+      trackerMeasurements.myHypertension[selectedDataType] = [
+        ...trackerMeasurements.myHypertension[selectedDataType],
+        newData,
+      ];
+    } else if (
+      selectedDataType == "cholesterol" ||
+      selectedDataType === "ldlCholesterol" ||
+      selectedDataType === "hdlCholesterol"
+    ) {
+      trackerMeasurements.myDiabetes[selectedDataType] = [
+        ...trackerMeasurements.myDiabetes[selectedDataType],
+        newData,
+      ];
+    } else if (
+      selectedDataType === "waistCircumference" ||
+      selectedDataType === "weight"
+    ) {
+      trackerMeasurements.bodyMeasurements[selectedDataType] = [
+        ...trackerMeasurements.bodyMeasurements[selectedDataType],
+        newData,
+      ];
+    } else if (selectedDataType === "restingHeartRate") {
+      trackerMeasurements.fitness[selectedDataType] = [
+        ...trackerMeasurements.fitness[selectedDataType],
+        newData,
       ];
     } else {
       trackerMeasurements[selectedCategory][selectedDataType] = [
@@ -139,10 +265,10 @@ export async function addTrackerData(req, res) {
         newData,
       ];
     }
-
     const updatedValue = await trackerMeasurements.save();
     res.send(updatedValue);
   } catch (error) {
+    res.send({ message: "Server Error" });
     console.log(error);
   }
 }

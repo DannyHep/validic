@@ -1,3 +1,5 @@
+import moment from "moment/moment.js";
+
 export const filterFitnessData = (validicData, dbData) => {
   const validicSteps = [];
   const validicDistance = [];
@@ -9,7 +11,8 @@ export const filterFitnessData = (validicData, dbData) => {
       const values = {
         value: metric.value,
         unit: metric.unit,
-        date: data.end_time,
+        date: moment(data.end_time).format("DD/MM/YYYY"),
+        time: moment(data.end_time).format("HH:mm"),
       };
       if (metric.type === "steps") {
         validicSteps.push(values);
@@ -24,8 +27,49 @@ export const filterFitnessData = (validicData, dbData) => {
   });
 
   const combineDbValidic = (validicData, dbData, type) => {
-    return [...validicData, ...dbData?.fitness[type]].sort((a, b) => {
-      return new Date(a.date) - new Date(b.date);
+    let concatDbAndValidic = [];
+
+    if (validicData && dbData) {
+      validicData.map((validicMetric) => {
+        // if validic date and db date are the same
+        if (
+          dbData.fitness[type].some((e) => {
+            return e.date === validicMetric.date;
+          })
+        ) {
+          // Find the db value with the same date
+          const dbDataToPush = dbData.fitness[type].find((e) => {
+            return e.date === validicMetric.date;
+          });
+          // Add the db value and the validic value together
+          const value = {
+            value: dbDataToPush.value + validicMetric.value,
+            unit: dbDataToPush.unit,
+            date: validicMetric.date,
+            time: validicMetric.time,
+          };
+          concatDbAndValidic.push(value);
+        } else {
+          concatDbAndValidic.push(validicMetric);
+        }
+      });
+      dbData.fitness[type].map((dbMetric) => {
+        if (
+          concatDbAndValidic.some((e) => e.date === dbMetric.date) === false
+        ) {
+          concatDbAndValidic.push(dbMetric);
+        }
+      });
+    } else if (dbData) {
+      concatDbAndValidic = dbData;
+    } else if (validicData) {
+      concatDbAndValidic = validicData;
+    }
+
+    return concatDbAndValidic.sort((a, b) => {
+      const newADate = a.date.split("/").reverse().join("/");
+      const newBDate = b.date.split("/").reverse().join("/");
+      return new Date(newADate) - new Date(newBDate);
     });
   };
 
@@ -33,78 +77,189 @@ export const filterFitnessData = (validicData, dbData) => {
     steps: combineDbValidic(validicSteps, dbData, "steps"),
     distance: combineDbValidic(validicDistance, dbData, "distance"),
     energyBurned: combineDbValidic(validicEnergyBurned, dbData, "energyBurned"),
-    restingHeartRate: combineDbValidic(
-      ValidicrestingHeartRate,
-      dbData,
-      "restingHeartRate"
-    ),
   };
+};
+
+// Nutrition functions
+const addValidicDate = (validicData) => {
+  const dayData = [];
+  //If date does not match - validic data to array
+  validicData.metrics.map((metric) => {
+    const combinedValue = {
+      name: metric.type,
+      value: metric.value,
+      unit: metric.unit,
+    };
+    dayData.push(combinedValue);
+  });
+  const date = moment(validicData.end_time).format("DD/MM/YYYY");
+  dayData.push({ date: date });
+  return dayData;
+};
+
+const addDbData = (nutritionData) => {
+  const dbDayData = [];
+  for (let dbDataValue in nutritionData) {
+    switch (dbDataValue) {
+      case "calcium":
+      case "carbohydrate":
+      case "dietary_fiber":
+      case "energy_consumed":
+      case "fat":
+      case "protein":
+      case "saturated_fat":
+      case "unsaturated_fat":
+      case "sodium":
+      case "sugars":
+      case "water":
+        const combinedValue = {
+          name: dbDataValue,
+          value: nutritionData[dbDataValue].value,
+          unit: nutritionData[dbDataValue].unit,
+        };
+        dbDayData.push(combinedValue);
+        break;
+    }
+  }
+  const date = nutritionData.date;
+  dbDayData.push({ date: date });
+  return dbDayData;
 };
 
 export const filterNutritionData = (validicData, dbData) => {
   const nutritionArray = [];
 
-  dbData.nutrition.map((dbData) => {
-    console.log(dbData);
-    // validicData.nutrition?.data.map((validicData) => {
-    //   validicData.metrics.map((metric) => {
-    //     console.log(metric.type);
-    //     if (dbData[metric.type]) {
-    //       console.log(data[metric.type]);
-    //     }
-    //   });
-    // });
-    nutritionArray.push(dbData);
-  });
+  if (dbData.nutrition.length) {
+    dbData.nutrition.map((nutritionData) => {
+      validicData?.nutrition.data.map((validicData) => {
+        // If DB date is same as validic date
+        if (
+          nutritionData.date ===
+          moment(validicData.end_time).format("DD/MM/YYYY")
+        ) {
+          const dayData = [];
 
-  // validicData.nutrition?.data.map((data) => {
-  //   const dataObj = [];
-  //   data?.metrics.map((metric) => {
-  //     const value = {
-  //       name: metric.type,
-  //       value: metric.value,
-  //       unit: metric.unit,
-  //       date: data.end_time,
-  //     };
-  //     dataObj.push(value);
-  //   });
-  //   nutritionArray.push({ dataObj });
-  // });
+          // check if metric name in db matches metric name in validic
+          // if true, add the values together and push to day array
+          for (let dbDataValue in nutritionData) {
+            switch (dbDataValue) {
+              case "calcium":
+              case "carbohydrate":
+              case "dietary_fiber":
+              case "energy_consumed":
+              case "fat":
+              case "protein":
+              case "saturated_fat":
+              case "unsaturated_fat":
+              case "sodium":
+              case "sugars":
+              case "water":
+                validicData.metrics.map((metric) => {
+                  if (metric.type === dbDataValue) {
+                    const combinedValue = {
+                      name: metric.type,
+                      value: nutritionData[dbDataValue].value + metric.value,
+                      unit: metric.unit,
+                    };
+                    dayData.push(combinedValue);
+                  }
+                });
+                break;
+            }
+          }
 
-  // const dbKeysArr = Object.keys(dbData.nutrition);
+          // Check if day array contains validic metric name and add values that are not already in the day array
+          for (let dbDataValue in nutritionData) {
+            switch (dbDataValue) {
+              case "calcium":
+              case "carbohydrate":
+              case "dietary_fiber":
+              case "energy_consumed":
+              case "fat":
+              case "protein":
+              case "saturated_fat":
+              case "unsaturated_fat":
+              case "sodium":
+              case "sugars":
+              case "water":
+                validicData.metrics.map((metric) => {
+                  // check if any validic names don't match already what's in the day array and add if needed
+                  if (
+                    dayData.some((e) => {
+                      return e.name === metric.type;
+                    }) === false
+                  ) {
+                    const combinedValue = {
+                      name: metric.type,
+                      value: nutritionData[dbDataValue].value,
+                      unit: nutritionData[dbDataValue].unit,
+                    };
+                    dayData.push(combinedValue);
+                    // check if any DB names don't match already what's in the day array and add if needed
+                  }
+                });
 
-  // const combineAndSortDbValidic = (validicData, dbData) => {
-  //   // console.log(validicData);
-  //   // console.log(validicData)
-  //   validicData.map((data) => {
-  //     // console.log(data);
-  //     // console.log(dbData.nutrition, "here 1 ");
-  //     for (let nutritionType in dbData.nutrition) {
-  //       if (nutritionType === data.dataObj.name) {
-  //         console.log("match");
-  //       }
-  //     }
-  //     // dbData.nutrition.map((dbData) => {
-  //     //   if (dbData.date === data.date) {
-  //     //     console.log("match", dbData.date, data.date);
-  //     // }
-  //     // });
-  //   });
+                if (
+                  dayData.some((e) => {
+                    return e.name === dbDataValue;
+                  }) === false
+                ) {
+                  const combinedValue = {
+                    name: dbDataValue,
+                    value: nutritionData[dbDataValue].value,
+                    unit: nutritionData[dbDataValue].unit,
+                  };
+                  dayData.push(combinedValue);
+                }
+                break;
+            }
+          }
 
-  //   // dbData.nutrition[metric.type].map((data) => {
-  //   //   console.log(metric.type);
-  //   //   console.log(data);
-  //   // });
-  //   // nutritionArray.map((day) => {
-  //   //   console.log(dbData?.nutrition[type]);
-  //   //   dbData?.nutrition[type].map((dbType) => {});
-  //   // });
+          const formattedDate = moment(validicData.end_time).format(
+            "DD/MM/YYYY"
+          );
+          dayData.push({ date: formattedDate });
+          nutritionArray.push(dayData);
+        }
+      });
+    });
 
-  //   // return [...validicData, ...dbData?.nutrition[type]].sort((a, b) => {
-  //   //   return new Date(a.date) - new Date(b.date);
-  //   // });
-  // };
+    dbData.nutrition.map((nutritionData) => {
+      validicData?.nutrition.data.map((validicData) => {
+        if (
+          nutritionArray.some((e) => {
+            return (
+              e[e.length - 1].date ===
+              moment(validicData.end_time).format("DD/MM/YYYY")
+            );
+          }) === false
+        ) {
+          nutritionArray.push(addValidicDate(validicData));
+        }
+      });
 
+      if (
+        nutritionArray.some(
+          (e) => e[e.length - 1].date === nutritionData.date
+        ) === false
+      ) {
+        nutritionArray.push(addDbData(nutritionData));
+      }
+    });
+  } else {
+    validicData?.nutrition.data.map((validicData) => {
+      if (
+        nutritionArray.some((e) => {
+          return (
+            e[e.length - 1].date ===
+            moment(validicData.end_time).format("DD/MM/YYYY")
+          );
+        }) === false
+      ) {
+        nutritionArray.push(addValidicDate(validicData));
+      }
+    });
+  }
   return {
     nutritionArray,
   };
@@ -115,13 +270,15 @@ export const filterCirculatoryHealth = (validicData, dbData) => {
   const validicDiastolic = [];
   const validicPulse = [];
   const validicBodyTemperature = [];
+  const ValidicRestingHeartRate = [];
 
   validicData.measurements?.data.map((data) => {
     data?.metrics.map((metric) => {
       const values = {
         value: metric.value,
         unit: metric.unit,
-        date: data.end_time,
+        date: moment(data.end_time).format("DD/MM/YYYY"),
+        time: moment(data.end_time).format("HH:mm"),
       };
       if (metric.type === "systolic") {
         validicSystolic.push(values);
@@ -131,6 +288,8 @@ export const filterCirculatoryHealth = (validicData, dbData) => {
         validicPulse.push(values);
       } else if (metric.type === "body_temperature") {
         validicBodyTemperature.push(values);
+      } else if (metric.type === "resting_heart_rate") {
+        ValidicRestingHeartRate.push(values);
       }
     });
   });
@@ -141,19 +300,36 @@ export const filterCirculatoryHealth = (validicData, dbData) => {
         ...validicData,
         ...dbData?.circulatoryHealth.bloodPressure[type],
       ].sort((a, b) => {
-        return new Date(a.date) - new Date(b.date);
+        const newADate = a.date.split("/").reverse().join("/");
+        const newBDate = b.date.split("/").reverse().join("/");
+        return new Date(newADate) - new Date(newBDate);
       });
+    }
+    if (type === "restingHeartRate") {
+      return [...validicData, ...dbData?.fitness.restingHeartRate].sort(
+        (a, b) => {
+          const newADate = a.date.split("/").reverse().join("/");
+          const newBDate = b.date.split("/").reverse().join("/");
+          return new Date(newADate) - new Date(newBDate);
+        }
+      );
     } else {
       return [...validicData, ...dbData?.circulatoryHealth[type]].sort(
         (a, b) => {
-          return new Date(a.date) - new Date(b.date);
+          const newADate = a.date.split("/").reverse().join("/");
+          const newBDate = b.date.split("/").reverse().join("/");
+          return new Date(newADate) - new Date(newBDate);
         }
       );
     }
   };
 
   return {
-    pulse: combineDbValidic(validicPulse, dbData, "pulse"),
+    restingHeartRate: combineDbValidic(
+      ValidicRestingHeartRate,
+      dbData,
+      "restingHeartRate"
+    ),
     bloodPressure: {
       systolic: combineDbValidic(validicSystolic, dbData, "systolic"),
       diastolic: combineDbValidic(validicDiastolic, dbData, "diastolic"),
@@ -174,7 +350,8 @@ export const filterRespiratoryHealth = (validicData, dbData) => {
       const values = {
         value: metric.value,
         unit: metric.unit,
-        date: data.end_time,
+        date: moment(data.end_time).format("DD/MM/YYYY"),
+        time: moment(data.end_time).format("HH:mm"),
       };
       if (metric.type === "spo2") {
         validicSp02.push(values);
@@ -184,15 +361,31 @@ export const filterRespiratoryHealth = (validicData, dbData) => {
 
   const combineDbValidic = (validicData, dbData, type) => {
     return [...validicData, ...dbData?.respiratoryHealth[type]].sort((a, b) => {
-      return new Date(a.date) - new Date(b.date);
+      const newADate = a.date.split("/").reverse().join("/");
+      const newBDate = b.date.split("/").reverse().join("/");
+      return new Date(newADate) - new Date(newBDate);
     });
+  };
+
+  const sortDate = (data) => {
+    if (Array.isArray(data)) {
+      return data.sort((a, b) => {
+        const newADate = a.date.split("/").reverse().join("/");
+        const newBDate = b.date.split("/").reverse().join("/");
+        return new Date(newADate) - new Date(newBDate);
+      });
+    }
   };
 
   return {
     sp02: combineDbValidic(validicSp02, dbData, "sp02"),
-    respirationRate: dbData?.respiratoryHealth["respirationRate"],
-    peakExpiratoryFlow: dbData?.respiratoryHealth["peakExpiratoryFlow"],
-    degreeOfBreathlessness: dbData?.respiratoryHealth["degreeOfBreathlessness"],
+    respirationRate: sortDate(dbData?.respiratoryHealth["respirationRate"]),
+    peakExpiratoryFlow: sortDate(
+      dbData?.respiratoryHealth["peakExpiratoryFlow"]
+    ),
+    degreeOfBreathlessness: sortDate(
+      dbData?.respiratoryHealth["degreeOfBreathlessness"]
+    ),
   };
 };
 
@@ -211,7 +404,8 @@ export const filterBodyMeasurements = (validicData, dbData) => {
       const values = {
         value: metric.value,
         unit: metric.unit,
-        date: data.end_time,
+        date: moment(data.end_time).format("DD/MM/YYYY"),
+        time: moment(data.end_time).format("HH:mm"),
       };
       if (metric.type === "body_weight") {
         validicBodyWeight.push(values);
@@ -237,12 +431,16 @@ export const filterBodyMeasurements = (validicData, dbData) => {
     if (dbData) {
       return [...validicData, ...dbData?.bodyMeasurements[type]].sort(
         (a, b) => {
-          return new Date(a.date) - new Date(b.date);
+          const newADate = a.date.split("/").reverse().join("/");
+          const newBDate = b.date.split("/").reverse().join("/");
+          return new Date(newADate) - new Date(newBDate);
         }
       );
     } else {
       return validicData.sort((a, b) => {
-        return new Date(a.date) - new Date(b.date);
+        const newADate = a.date.split("/").reverse().join("/");
+        const newBDate = b.date.split("/").reverse().join("/");
+        return new Date(newADate) - new Date(newBDate);
       });
     }
   };
@@ -276,7 +474,8 @@ export const filterMyDiabetes = (validicData, dbData) => {
       const values = {
         value: metric.value,
         unit: metric.unit,
-        date: data.end_time,
+        date: moment(data.end_time).format("DD/MM/YYYY"),
+        time: moment(data.end_time).format("HH:mm"),
       };
       if (metric.type === "blood_glucose") {
         validicBloodGlucose.push(values);
@@ -300,11 +499,25 @@ export const filterMyDiabetes = (validicData, dbData) => {
         ...validicData,
         ...dbData?.circulatoryHealth.bloodPressure[type],
       ].sort((a, b) => {
-        return new Date(a.date) - new Date(b.date);
+        const newADate = a.date.split("/").reverse().join("/");
+        const newBDate = b.date.split("/").reverse().join("/");
+        return new Date(newADate) - new Date(newBDate);
       });
     } else {
       return [...validicData, ...dbData?.myDiabetes[type]].sort((a, b) => {
-        return new Date(a.date) - new Date(b.date);
+        const newADate = a.date.split("/").reverse().join("/");
+        const newBDate = b.date.split("/").reverse().join("/");
+        return new Date(newADate) - new Date(newBDate);
+      });
+    }
+  };
+
+  const sortDate = (data) => {
+    if (Array.isArray(data)) {
+      return data.sort((a, b) => {
+        const newADate = a.date.split("/").reverse().join("/");
+        const newBDate = b.date.split("/").reverse().join("/");
+        return new Date(newADate) - new Date(newBDate);
       });
     }
   };
@@ -313,21 +526,20 @@ export const filterMyDiabetes = (validicData, dbData) => {
     bloodGlucose: combineDbValidic(validicBloodGlucose, dbData, "bloodGlucose"),
     bloodKetone: combineDbValidic(validicBloodKetone, dbData, "bloodKetone"),
     insulin: combineDbValidic(validicInsulin, dbData, "insulin"),
-    hbA1c: {
-      recordedInLastTwelveMonths:
-        dbData?.myDiabetes.hbA1c.recordedInLastTwelveMonths,
-      measurements: dbData?.myDiabetes.hbA1c.measurements,
-    },
+    hbA1c: sortDate(dbData?.myDiabetes.hbA1c),
     bloodPressure: {
       systolic: combineDbValidic(validicSystolic, dbData, "systolic"),
       diastolic: combineDbValidic(validicDiastolic, dbData, "diastolic"),
     },
     cholesterol: combineDbValidic(validicCholesterol, dbData, "cholesterol"),
-    ldlCholesterol: dbData?.myDiabetes.ldlCholesterol,
-    hdlCholesterol: dbData?.myDiabetes.hdlCholesterol,
-    retinalScanInLastTwelveMonths:
-      dbData?.myDiabetes.retinalScanInLastTwelveMonths,
-    footScanInLastTwelveMonths: dbData?.myDiabetes.footScanInLastTwelveMonths,
+    ldlCholesterol: sortDate(dbData?.myDiabetes.ldlCholesterol),
+    hdlCholesterol: sortDate(dbData?.myDiabetes.hdlCholesterol),
+    retinalScanInLastTwelveMonths: sortDate(
+      dbData?.myDiabetes.retinalScanInLastTwelveMonths
+    ),
+    footScanInLastTwelveMonths: sortDate(
+      dbData?.myDiabetes.footScanInLastTwelveMonths
+    ),
   };
 };
 
@@ -342,7 +554,8 @@ export const filterMyHypertension = (validicData, dbData) => {
       const values = {
         value: metric.value,
         unit: metric.unit,
-        date: data.end_time,
+        date: moment(data.end_time).format("DD/MM/YYYY"),
+        time: moment(data.end_time).format("HH:mm"),
       };
       if (metric.type === "systolic") {
         validicSystolic.push(values);
@@ -362,21 +575,39 @@ export const filterMyHypertension = (validicData, dbData) => {
         ...validicData,
         ...dbData?.circulatoryHealth.bloodPressure[type],
       ].sort((a, b) => {
-        return new Date(a.date) - new Date(b.date);
+        const newADate = a.date.split("/").reverse().join("/");
+        const newBDate = b.date.split("/").reverse().join("/");
+        return new Date(newADate) - new Date(newBDate);
       });
     } else if (type === "cholesterol") {
       return [...validicData, ...dbData?.myDiabetes[type]].sort((a, b) => {
-        return new Date(a.date) - new Date(b.date);
+        const newADate = a.date.split("/").reverse().join("/");
+        const newBDate = b.date.split("/").reverse().join("/");
+        return new Date(newADate) - new Date(newBDate);
       });
     } else if (type === "waistCircumference") {
       return [...validicData, ...dbData?.bodyMeasurements[type]].sort(
         (a, b) => {
-          return new Date(a.date) - new Date(b.date);
+          const newADate = a.date.split("/").reverse().join("/");
+          const newBDate = b.date.split("/").reverse().join("/");
+          return new Date(newADate) - new Date(newBDate);
         }
       );
     } else {
       return [...validicData, ...dbData?.myHypertension[type]].sort((a, b) => {
-        return new Date(a.date) - new Date(b.date);
+        const newADate = a.date.split("/").reverse().join("/");
+        const newBDate = b.date.split("/").reverse().join("/");
+        return new Date(newADate) - new Date(newBDate);
+      });
+    }
+  };
+
+  const sortDate = (data) => {
+    if (Array.isArray(data)) {
+      return data.sort((a, b) => {
+        const newADate = a.date.split("/").reverse().join("/");
+        const newBDate = b.date.split("/").reverse().join("/");
+        return new Date(newADate) - new Date(newBDate);
       });
     }
   };
@@ -388,8 +619,8 @@ export const filterMyHypertension = (validicData, dbData) => {
       diastolic: combineDbValidic(validicDiastolic, dbData, "diastolic"),
     },
     cholesterol: combineDbValidic(validicCholesterol, dbData, "cholesterol"),
-    ldlCholesterol: dbData?.myDiabetes.ldlCholesterol,
-    hdlCholesterol: dbData?.myDiabetes.hdlCholesterol,
+    ldlCholesterol: sortDate(dbData?.myDiabetes.ldlCholesterol),
+    hdlCholesterol: sortDate(dbData?.myDiabetes.hdlCholesterol),
     waistCircumference: combineDbValidic(
       validicBodyWaist,
       dbData,
@@ -410,7 +641,8 @@ export const filterMyHeartHealth = (validicData, dbData) => {
       const values = {
         value: metric.value,
         unit: metric.unit,
-        date: data.end_time,
+        date: moment(data.end_time).format("DD/MM/YYYY"),
+        time: moment(data.end_time).format("HH:mm"),
       };
       if (metric.type === "systolic") {
         validicSystolic.push(values);
@@ -432,25 +664,45 @@ export const filterMyHeartHealth = (validicData, dbData) => {
         ...validicData,
         ...dbData?.circulatoryHealth.bloodPressure[type],
       ].sort((a, b) => {
-        return new Date(a.date) - new Date(b.date);
+        const newADate = a.date.split("/").reverse().join("/");
+        const newBDate = b.date.split("/").reverse().join("/");
+        return new Date(newADate) - new Date(newBDate);
       });
     } else if (type === "cholesterol") {
       return [...validicData, ...dbData?.myDiabetes[type]].sort((a, b) => {
-        return new Date(a.date) - new Date(b.date);
+        const newADate = a.date.split("/").reverse().join("/");
+        const newBDate = b.date.split("/").reverse().join("/");
+        return new Date(newADate) - new Date(newBDate);
       });
     } else if (type === "bloodSodium") {
       return [...validicData, ...dbData?.myHypertension[type]].sort((a, b) => {
-        return new Date(a.date) - new Date(b.date);
+        const newADate = a.date.split("/").reverse().join("/");
+        const newBDate = b.date.split("/").reverse().join("/");
+        return new Date(newADate) - new Date(newBDate);
       });
     } else if (type === "waistCircumference" || type === "weight") {
       return [...validicData, ...dbData?.bodyMeasurements[type]].sort(
         (a, b) => {
-          return new Date(a.date) - new Date(b.date);
+          const newADate = a.date.split("/").reverse().join("/");
+          const newBDate = b.date.split("/").reverse().join("/");
+          return new Date(newADate) - new Date(newBDate);
         }
       );
     } else {
       return [...validicData, ...dbData?.myHypertension[type]].sort((a, b) => {
-        return new Date(a.date) - new Date(b.date);
+        const newADate = a.date.split("/").reverse().join("/");
+        const newBDate = b.date.split("/").reverse().join("/");
+        return new Date(newADate) - new Date(newBDate);
+      });
+    }
+  };
+
+  const sortDate = (data) => {
+    if (Array.isArray(data)) {
+      return data.sort((a, b) => {
+        const newADate = a.date.split("/").reverse().join("/");
+        const newBDate = b.date.split("/").reverse().join("/");
+        return new Date(newADate) - new Date(newBDate);
       });
     }
   };
@@ -462,19 +714,19 @@ export const filterMyHeartHealth = (validicData, dbData) => {
       diastolic: combineDbValidic(validicDiastolic, dbData, "diastolic"),
     },
     cholesterol: combineDbValidic(validicCholesterol, dbData, "cholesterol"),
-    ldlCholesterol: dbData?.myDiabetes.ldlCholesterol,
-    hdlCholesterol: dbData?.myDiabetes.hdlCholesterol,
+    ldlCholesterol: sortDate(dbData?.myDiabetes.ldlCholesterol),
+    hdlCholesterol: sortDate(dbData?.myDiabetes.hdlCholesterol),
     waistCircumference: combineDbValidic(
       validicBodyWaist,
       dbData,
       "waistCircumference"
     ),
     weight: combineDbValidic(validicBodyWeight, dbData, "weight"),
-    bloodEGFR: dbData?.myHeartHealth.bloodEGFR,
-    bloodCreatinine: dbData?.myHeartHealth.bloodCreatinine,
-    daysOfBreathlessness: dbData?.myHeartHealth.daysOfBreathlessness,
-    daysOfSwollenAnkles: dbData?.myHeartHealth.daysOfSwollenAnkles,
-    daysOfChestPain: dbData?.myHeartHealth.daysOfChestPain,
+    bloodEGFR: sortDate(dbData?.myHeartHealth.bloodEGFR),
+    bloodCreatinine: sortDate(dbData?.myHeartHealth.bloodCreatinine),
+    daysOfBreathlessness: sortDate(dbData?.myHeartHealth.daysOfBreathlessness),
+    daysOfSwollenAnkles: sortDate(dbData?.myHeartHealth.daysOfSwollenAnkles),
+    daysOfChestPain: sortDate(dbData?.myHeartHealth.daysOfChestPain),
   };
 };
 
@@ -494,7 +746,8 @@ export const filterMySleep = (validicData, dbData) => {
       const values = {
         value: metric.value,
         unit: metric.unit,
-        date: data.end_time,
+        date: moment(data.end_time).format("DD/MM/YYYY"),
+        time: moment(data.end_time).format("HH:mm"),
       };
       if (metric.type === "awake_count") {
         validicAwakeCount.push(values);
@@ -520,12 +773,13 @@ export const filterMySleep = (validicData, dbData) => {
 
   const combineDbValidic = (validicData) => {
     return validicData.sort((a, b) => {
-      return new Date(a.date) - new Date(b.date);
+      const newADate = a.date.split("/").reverse().join("/");
+      const newBDate = b.date.split("/").reverse().join("/");
+      return new Date(newADate) - new Date(newBDate);
     });
   };
 
   return {
-    sleepScore: combineDbValidic(validicSleepScore),
     inBedDuration: combineDbValidic(validicInBedDuration),
     sleepDuration: combineDbValidic(validicSleepDuration),
     awakeCount: combineDbValidic(validicAwakeCount),
@@ -538,36 +792,77 @@ export const filterMySleep = (validicData, dbData) => {
 };
 
 export const filterStopSmoking = (dbData) => {
+  const sortDate = (data) => {
+    if (Array.isArray(data)) {
+      return data.sort((a, b) => {
+        const newADate = a.date.split("/").reverse().join("/");
+        const newBDate = b.date.split("/").reverse().join("/");
+        return new Date(newADate) - new Date(newBDate);
+      });
+    }
+  };
+
   return {
-    cigarettesPerDay: dbData?.stopSmoking.cigarettesPerDay,
-    lastCigaretteTimeDate: dbData?.stopSmoking.lastCigaretteTimeDate,
-    usingNicotineReplacement: dbData?.stopSmoking.usingNicotineReplacement,
-    morningTimeToFirstCigarette:
-      dbData?.stopSmoking.morningTimeToFirstCigarette,
+    cigarettesPerDay: sortDate(dbData?.stopSmoking.cigarettesPerDay),
+    morningTimeToFirstCigarette: sortDate(
+      dbData?.stopSmoking.morningTimeToFirstCigarette
+    ),
+    lastCigaretteTimeDate: sortDate(dbData?.stopSmoking.lastCigaretteTimeDate),
+    usingNicotineReplacement: sortDate(
+      dbData?.stopSmoking.usingNicotineReplacement
+    ),
     startDateOfStopSmokingProgram:
       dbData?.stopSmoking.startDateOfStopSmokingProgram,
   };
 };
 
 export const filterMyPain = (dbData) => {
+  const sortDate = (data) => {
+    if (Array.isArray(data)) {
+      return data.sort((a, b) => {
+        const newADate = a.date.split("/").reverse().join("/");
+        const newBDate = b.date.split("/").reverse().join("/");
+        return new Date(newADate) - new Date(newBDate);
+      });
+    }
+  };
   return {
-    numDaysWithMildModeratePain: dbData?.myPain.numDaysWithMildModeratePain,
-    numDaysSeverePain: dbData?.myPain.numDaysSeverePain,
-    degreeOfPain: dbData?.myPain.degreeOfPain,
+    numDaysWithMildModeratePain: sortDate(
+      dbData?.myPain.numDaysWithMildModeratePain
+    ),
+    numDaysSeverePain: sortDate(dbData?.myPain.numDaysSeverePain),
+    degreeOfPain: sortDate(dbData?.myPain.degreeOfPain),
   };
 };
 
 export const filterDrinkLess = (dbData) => {
+  const sortDate = (data) => {
+    if (Array.isArray(data)) {
+      return data.sort((a, b) => {
+        const newADate = a.date.split("/").reverse().join("/");
+        const newBDate = b.date.split("/").reverse().join("/");
+        return new Date(newADate) - new Date(newBDate);
+      });
+    }
+  };
   return {
-    numAlcoholUnits: dbData?.drinkLess.numAlcoholUnits,
-    hadADrinkToday: dbData?.drinkLess.hadADrinkToday,
-    alcoholFreeDays: dbData?.drinkLess.alcoholFreeDays,
+    numAlcoholUnits: sortDate(dbData?.drinkLess.numAlcoholUnits),
+    hadADrinkToday: sortDate(dbData?.drinkLess.hadADrinkToday),
+    alcoholFreeDays: sortDate(dbData?.drinkLess.alcoholFreeDays),
   };
 };
 
 export const filterMyMood = (dbData) => {
+  const sortDate = (data) => {
+    if (Array.isArray(data)) {
+      return data.sort((a, b) => {
+        const newADate = a.date.split("/").reverse().join("/");
+        const newBDate = b.date.split("/").reverse().join("/");
+        return new Date(newADate) - new Date(newBDate);
+      });
+    }
+  };
   return {
-    positiveDaysThisWeek: dbData?.myMood.positiveDaysThisWeek,
-    moodScale: dbData?.myMood.moodScale,
+    moodScale: sortDate(dbData?.myMood.moodScale),
   };
 };
