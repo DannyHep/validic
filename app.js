@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import { router } from "./routes/user.js";
 import "dotenv/config";
 import { corsConfig } from "./config/corsConfig.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 const port = process.env.PORT || 8088;
@@ -23,6 +24,7 @@ mongoose
 
 app.use(express.json());
 app.use(cors(corsConfig));
+app.use(cookieParser());
 
 // routes
 app.use("/user", router);
