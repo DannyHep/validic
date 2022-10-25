@@ -3,7 +3,7 @@ import HealthTrackerValues from "../models/healthTracker.js";
 import { healthTrackerParser } from "./parsers/healthTrackerParser.js";
 
 export async function createNewUser(req, res) {
-  const { uid } = req.body;
+  const  uid  = req.user._id; // this is Mongo user _ui
   try {
     const token = process.env.VALIDIC_TOKEN;
     const orgId = process.env.NSTFS_VALIDIC_ORGID;
@@ -36,7 +36,8 @@ export async function createNewUser(req, res) {
 }
 
 export async function getValidicProfile(req, res) {
-  const { patientId } = req.body;
+
+  const  patientId  = req.user._id; // MONGO_USER_ID
   try {
     const token = process.env.VALIDIC_TOKEN;
     const orgId = process.env.NSTFS_VALIDIC_ORGID;
@@ -123,8 +124,8 @@ export async function getTrackerMeasurements(PASID) {
 }
 
 export async function addTrackerData(req, res) {
-  const { selectedDataType, pasID, newData, selectedCategory } = req.body;
-
+  const { selectedDataType, newData, selectedCategory } = req.body; // PASID
+  const pasID = req.user.PASID
   try {
     const trackerMeasurements = await HealthTrackerValues.findOne({
       PASID: pasID,
@@ -274,7 +275,8 @@ export async function addTrackerData(req, res) {
 }
 
 export async function parsedTrackerData(req, res) {
-  const { uid, PASID } = req.body;
+  const  uid = req.user._id
+  const PASID = req.user.PASID
 
   try {
     const validicData = await getValidicFitnessData(uid);
