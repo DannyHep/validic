@@ -16,14 +16,15 @@ const trustedURLs = [
   "http://localhost:3001",
 
   "https://demo.patientaide.co.uk",
-];
+]
 
 export const corsConfig = {
   origin: function (origin, callback) {
     if (!origin || trustedURLs.includes(origin)) {
-      callback(null, true);
+      callback(null, true)
     } else {
-      callback(new Error("Origin not allowed"));
+      callback(new Error("Origin not allowed"))
     }
   },
-};
+  credentials: true,
+}
