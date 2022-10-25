@@ -17,7 +17,7 @@ router.post("/createHealthTrackerValues", createTrackerMeasurements); // this ro
 router.use(authenticateUser)
 router.post("/create-validic-profile", createNewUser); // I got error using PASID 70755 pete123 Lorenzo12!
 router.get("/validic-profile", getValidicProfile);
-router.post("/getTrackerMeasurements", parsedTrackerData);
+router.get("/getTrackerMeasurements", parsedTrackerData);
 router.put("/addTrackerData", addTrackerData);
 
 export { router };
